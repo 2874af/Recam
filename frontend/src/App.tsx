@@ -10,8 +10,9 @@ import ClientListPage from './pages/ClientListPage'
 import CreateClientPage from './pages/CreateClientPage'
 import CreateOrderPage from './pages/CreateOrderPage'
 import OrderDetailPage from './pages/OrderDetailPage'
-import ScheduledDeliveryPage from './pages/ScheduledDeliveryPage'
 import StaffListPage from './pages/StaffListPage'
+import ClientDetailPage from './pages/ClientDetailPage'
+import ScheduledOrderDliveryPage from './pages/ScheduledOrderDliveryPage'
 
 function App() {
 
@@ -28,8 +29,9 @@ function App() {
         <Route path="/createorder" element={<CreateOrderPage />} />
         <Route path="/createclient" element={<CreateClientPage />} />
         <Route path="/orderdetail" element={<OrderDetailPage />} />
-        <Route path="/scheduleddelivery" element={<ScheduledDeliveryPage />} />
         <Route path="/stafflist" element={<StaffListPage />} />
+        <Route path="/clientdetail" element={<ClientDetailPage />} />
+        <Route path="/scheduleddelivery" element={<ScheduledOrderDliveryPage />} />
       </Routes>
     </>
   )

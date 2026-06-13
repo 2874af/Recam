@@ -9,7 +9,7 @@ function Services({icon, service, status, setter}:ServicesProps){
   return (
     <button 
       type="button"
-      className={`w-44 h-13 flex border border-black rounded-lg justify-center items-center ${
+      className={`w-44 h-13 flex border border-black rounded-lg justify-center items-center hover:border-2 hover:border-blue-500 active:border-2 active:border-blue-600 ${
         status
           ? " bg-blue-200"
           : " bg-white"

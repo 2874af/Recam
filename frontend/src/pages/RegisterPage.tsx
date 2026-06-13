@@ -46,7 +46,7 @@ function RegisterPage() {
         <form className="flex flex-col gap-4" onSubmit = {submitHandler}>
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="agency" className="px-3 text-sx text-left font-medium">Company Name</label>
+            <label htmlFor="agency" className="px-2 text-sx text-left font-bold">Company Name</label>
 
             <select id="agency" className="w-100 bg-white h-11 rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="realestate">Real Estate</option>

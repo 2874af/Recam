@@ -7,16 +7,17 @@ import { useState } from "react";
 import ProfileUploader from "../compoments/ProfileUploader";
 import SuccessDialog from "../compoments/SuccessDialog";
 
-function CreateClientPage(){
+function ClientDetailPage(){
   const navigate = useNavigate();
+  const [firstname, setFirstname] = useState("Justin");
+  const [lastname, setLastname] = useState("Bieber");
+  const [email, setEmail] = useState("justin@outlook.com");
+  const [phone, setPhone] = useState("0425843412");
+  const [company, setCompany] = useState("Bieber Studio");
+  const [image, setImage] = useState("https://picsum.photos/200/200");
   const [open, setOpen] = useState(false);
-  const [lastname, setLastname] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [company, setCompany] = useState("");
-  const [image, setImage] = useState<File | null>(null);
   const [create, setCreate] = useState(false);
+
 
   const submitHandler = () => {
     console.log("create successfully.");
@@ -36,7 +37,7 @@ function CreateClientPage(){
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 text-gray-400">
           <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
         </svg>
-        <span className="text-2xl pl-5">Create New Client</span>
+        <span className="text-2xl pl-5">{`${firstname} ${lastname}`}</span>
       </div>
 
       <form className="flex flex-col w-210 gap-6 py-6" onSubmit={submitHandler}>
@@ -128,7 +129,7 @@ function CreateClientPage(){
           <label className="px-1 text-sx text-left text-medium font-bold">Company Logo</label>
 
           {image ? 
-            <img src={URL.createObjectURL(image)}
+            <img src={image}
               alt="logo"
               className="w-30 h-30 object-cover rounded-2xl hover:border-2 hover:border-blue-500 active:border-2 active:border-blue-700"
               onClick={() => {setOpen(true)}}
@@ -143,13 +144,13 @@ function CreateClientPage(){
 
         </div>
         
-        {open && <ProfileUploader title="Upload Client Profile Image" setImage={setImage} image={image} setOpen={setOpen} />}
+        {open && <ProfileUploader title="Upload Client Profile Image" setImage={setImage} setOpen={setOpen} image={image} />}
       </form>
       
-      <Button className="w-40" onClick={()=>setCreate(true)}>Create</Button>
-      {create && <SuccessDialog word1="New Client is Created Successfully" word2="Confirm" onClick={()=>setCreate(false)} />}
+      <Button className="w-40" onClick={()=>setCreate(true)}>Save</Button>
+      {create && <SuccessDialog word1="Save Successfully" word2="Confirm" onClick={()=>setCreate(false)} />}
     </div>
   )
 }
 
-export default CreateClientPage;
+export default ClientDetailPage;
