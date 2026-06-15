@@ -107,7 +107,7 @@ function ProfileUploader({title, setOpen, setImage, image}: ProfileUploaderProps
 
         <Button type="button" className="w-40"
           onClick={clickHandler}
-          disabled={preview === ""}
+          disabled={preview === null}
         >Save</Button>
       </div>
     </div>

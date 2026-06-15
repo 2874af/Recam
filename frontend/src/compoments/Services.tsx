@@ -11,7 +11,7 @@ function Services({icon, service, status, setter}:ServicesProps){
       type="button"
       className={`w-44 h-13 flex border border-black rounded-lg justify-center items-center hover:border-2 hover:border-blue-500 active:border-2 active:border-blue-600 ${
         status
-          ? " bg-blue-200"
+          ? " bg-blue-200 border-2 border-blue-500"
           : " bg-white"
       }`}
       onClick={()=>{
