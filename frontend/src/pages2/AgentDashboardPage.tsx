@@ -75,7 +75,7 @@ function AgentDashboardPage(){
 
         </div>
         
-        <div className="overflow-auto flex flex-col items-center flex-1 pl-4 pt-5 gap-5">
+        <div className="overflow-auto flex flex-col items-center flex-1 pt-1 gap-5">
           <OrderBlock id={id} createTime={createTime} address={address} photo={photo} video={video} floor={floor} vr={vr} status="delivered" />
           <OrderBlock id={id} createTime={createTime} address={address} photo={photo} video={video} floor={floor} vr={vr} status="scheduled" />
         </div>

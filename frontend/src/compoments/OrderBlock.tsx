@@ -15,7 +15,7 @@ type OrderBlockProps = {
 function OrderBlock ({id, createTime, address, photo, video, vr, floor, status}: OrderBlockProps){
 
   return (
-    <div className="w-[96%] sm:w-[80%] bg-white rounded-xl shadow-xs px-8 pt-4 pb-5 relative">
+    <div className="w-[94%] sm:w-[80%] bg-white rounded-xl shadow-xs px-8 pt-4 pb-5 relative">
       <div>
         <span className={`px-4 py-1 flex w-fit justify-center text-white font-medium items-center rounded-tr-xl rounded-bl-xl absolute right-0 top-0 ${
           status === "scheduled" ? "bg-blue-300" : "bg-green-300"
