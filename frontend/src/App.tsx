@@ -16,6 +16,8 @@ import ScheduledOrderDliveryPage from './pages/ScheduledOrderDliveryPage'
 import CreateStaffPage from './pages/CreateStaffPage'
 import StaffDetailPage from './pages/StaffDetailPage'
 
+import AgentDashboardPage from './pages2/AgentDashboardPage'
+
 function App() {
 
   return (
@@ -36,6 +38,7 @@ function App() {
         <Route path="/scheduleddelivery" element={<ScheduledOrderDliveryPage />} />
         <Route path="/createstaff" element={<CreateStaffPage />} />
         <Route path="/staffdetail" element={<StaffDetailPage />} />
+        <Route path="/agentdashboard" element={<AgentDashboardPage />} />
       </Routes>
     </>
   )

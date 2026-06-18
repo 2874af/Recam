@@ -21,7 +21,7 @@ function CreateStaffPage(){
   const [url, setUrl] = useState("");
   
   return (
-     <div className="flex flex-col items-center">
+     <div className="flex flex-col items-center pb-10">
       <TopBar warnClick={()=>{
         setWarn(true);
         setUrl("/");
