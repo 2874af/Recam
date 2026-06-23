@@ -217,11 +217,11 @@ function ShowPage(){
 
       <div className="hidden sm:flex h-15 w-full items-center px-6 sticky top-0 bg-white z-50">
         <div className="flex gap-5 items-center flex-1">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" onClick={()=>navigate("/agentdashboard")} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 hover:text-gray-300 active:text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" onClick={()=>navigate("/agentdashboard")} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`size-7 hover:text-gray-300 active:text-gray-500`}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
           </svg>
 
-          <button onClick={()=>setDownload(true)} className="bg-blue-500 text-white font-medium flex gap-2 rounded-3xl py-1.5 px-3 items-center hover:bg-blue-600 active:bg-blue-700">
+          <button onClick={()=>setDownload(true)} className={`bg-blue-500 text-white font-medium flex gap-2 rounded-3xl py-1.5 px-3 items-center hover:bg-blue-600 active:bg-blue-700 ${edit ? "hidden" : "block"}`}>
             <svg width="19" height="19" viewBox="0 0 14 14" fill="white" xmlns="http://www.w3.org/2000/svg">
               <g clipPath="url(#clip0_25_62)">
               <path fillRule="evenodd" clipRule="evenodd" d="M7.00008 0.729126C3.5368 0.729126 0.729248 3.53667 0.729248 6.99996C0.729248 10.4633 3.5368 13.2708 7.00008 13.2708C10.4634 13.2708 13.2709 10.4633 13.2709 6.99996C13.2709 3.53667 10.4634 0.729126 7.00008 0.729126ZM7.58342 4.08329C7.58342 3.76113 7.32226 3.49996 7.00008 3.49996C6.67791 3.49996 6.41675 3.76113 6.41675 4.08329V5.83329H5.54175C5.30581 5.83329 5.09311 5.97545 5.00282 6.19338C4.91253 6.41138 4.96244 6.66227 5.12927 6.8291L6.58761 8.28743C6.8154 8.51529 7.18476 8.51529 7.41256 8.28743L8.87089 6.8291C9.03772 6.66227 9.08766 6.41138 8.99736 6.19338C8.90706 5.97545 8.69437 5.83329 8.45842 5.83329H7.58342V4.08329ZM5.24438 9.04163C4.92222 9.04163 4.66105 9.30278 4.66105 9.62496C4.66105 9.94713 4.92222 10.2083 5.24438 10.2083H8.74437C9.06654 10.2083 9.3277 9.94713 9.3277 9.62496C9.3277 9.30278 9.06654 9.04163 8.74437 9.04163H5.24438Z" fill="white"/>
@@ -238,12 +238,19 @@ function ShowPage(){
         </div>
 
         <div className="flex items-center gap-3">
-          <button onClick={()=>setEdit(true)} className="border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400">
+          <button onClick={()=>setEdit(true)} className={`border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400 ${edit ? "hidden" : "block"}`}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
               <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
               <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
             </svg>
             <span>Edit</span>
+          </button>
+
+          <button onClick={()=>setEdit(false)} className={`border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400 ${edit ? "block" : "hidden"}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
+              <path fillRule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm10.72 4.72a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H9a.75.75 0 0 1 0-1.5h10.94l-1.72-1.72a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+            </svg>
+            <span>Exit</span>
           </button>
 
           <button className="border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400">
@@ -254,7 +261,7 @@ function ShowPage(){
             <span>Preview</span>
           </button>
 
-          <button className="border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400">
+          <button className={`border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400`}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
               <path fillRule="evenodd" d="M19.902 4.098a3.75 3.75 0 0 0-5.304 0l-4.5 4.5a3.75 3.75 0 0 0 1.035 6.037.75.75 0 0 1-.646 1.353 5.25 5.25 0 0 1-1.449-8.45l4.5-4.5a5.25 5.25 0 1 1 7.424 7.424l-1.757 1.757a.75.75 0 1 1-1.06-1.06l1.757-1.757a3.75 3.75 0 0 0 0-5.304Zm-7.389 4.267a.75.75 0 0 1 1-.353 5.25 5.25 0 0 1 1.449 8.45l-4.5 4.5a5.25 5.25 0 1 1-7.424-7.424l1.757-1.757a.75.75 0 1 1 1.06 1.06l-1.757 1.757a3.75 3.75 0 1 0 5.304 5.304l4.5-4.5a3.75 3.75 0 0 0-1.035-6.037.75.75 0 0 1-.354-1Z" clipRule="evenodd" />
             </svg>
@@ -496,7 +503,7 @@ function ShowPage(){
 
               {photo.length === 4 && 
                 <div className="px-2 w-full gap-2 grid grid-cols-2 lg:px-60">
-                  {photo.map((p,index) => (
+                  {photo.map((p, index) => (
                     <div className="w-full h-full sm:h-90" key={index} onClick={()=>{
                       setPpage(index);
                       setPopen(true);
@@ -1202,7 +1209,7 @@ function ShowPage(){
       ))}
       
 
-      {menu && <MenuDialog setEdit={setEdit} setMenu={setMenu} choice={choice} onClick={scrollTo} photo={photo.length !== 0} video={video.length !== 0} vr={vr.length !== 0} floor={floor.length !== 0} sections={sections} />}
+      {menu && <MenuDialog setEdit={setEdit} setMenu={setMenu} choice={choice} onClick={scrollTo} photo={photo.length !== 0} video={video.length !== 0} vr={vr.length !== 0} floor={floor.length !== 0} sections={sections} edit={edit} />}
       {download && <DownloadDialog setDownload={setDownload} pnum={pnum} wnum={wnum} fnum={fnum} vnum={vnum} />}
       {popen && <PhotoDisplayDialog list={photo} setOpen={setPopen} page={ppage} setPage={setPpage} />}
       {fopen && <PhotoDisplayDialog list={floor} setOpen={setFopen} page={fpage} setPage={setFpage} />}
