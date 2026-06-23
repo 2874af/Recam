@@ -15,8 +15,8 @@ import ClientDetailPage from './pages/ClientDetailPage'
 import ScheduledOrderDliveryPage from './pages/ScheduledOrderDliveryPage'
 import CreateStaffPage from './pages/CreateStaffPage'
 import StaffDetailPage from './pages/StaffDetailPage'
-
 import AgentDashboardPage from './pages2/AgentDashboardPage'
+import ShowPage from './pages2/ShowPage'
 
 function App() {
 
@@ -39,6 +39,7 @@ function App() {
         <Route path="/createstaff" element={<CreateStaffPage />} />
         <Route path="/staffdetail" element={<StaffDetailPage />} />
         <Route path="/agentdashboard" element={<AgentDashboardPage />} />
+        <Route path="/showpage" element={<ShowPage />} />
       </Routes>
     </>
   )

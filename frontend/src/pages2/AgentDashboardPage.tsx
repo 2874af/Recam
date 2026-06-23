@@ -19,7 +19,7 @@ function AgentDashboardPage(){
 
   return (
     <div className = "flex flex-col w-full h-screen">
-      <div className="bg-black h-16 text-white flex items-center px-7 sm:hidden">
+      <div className="bg-black h-12 shrink-0 w-full text-white flex items-center px-7 text-base sm:hidden">
         <span>Hi, {agent}</span>
       </div>
 
@@ -42,7 +42,7 @@ function AgentDashboardPage(){
         </div>
 
         <div className ="flex px-6 justify-center w-full gap-2.5 py-6">
-          <div className={`h-10 w-[32%] flex items-center justify-center rounded-lg hover:bg-gray-200 active:font-bold ${
+          <div className={`h-12 w-[32%] flex items-center justify-center rounded-lg hover:bg-gray-200 active:font-bold ${
             choice ==="all"
               ? "bg-gray-200 font-bold"
               : "bg-gray-100 font-medium"
@@ -52,7 +52,7 @@ function AgentDashboardPage(){
             <span>All</span>
           </div>
 
-          <div className={`h-10 w-[32%] flex items-center justify-center rounded-lg hover:bg-gray-200 active:font-bold ${
+          <div className={`h-12 w-[32%] flex items-center justify-center rounded-lg hover:bg-gray-200 active:font-bold ${
             choice ==="scheduled"
               ? "bg-gray-200 font-bold"
               : "bg-gray-100 font-medium"
@@ -62,7 +62,7 @@ function AgentDashboardPage(){
             <span>Scheduled</span>
           </div>
 
-          <div className={`h-10 w-[32%] flex items-center justify-center rounded-lg hover:bg-gray-200 active:font-bold relative ${
+          <div className={`h-12 w-[32%] flex items-center justify-center rounded-lg hover:bg-gray-200 active:font-bold relative ${
             choice ==="delivered"
               ? "bg-gray-200 font-bold"
               : "bg-gray-100 font-medium"
@@ -70,7 +70,7 @@ function AgentDashboardPage(){
             onClick={()=>setChoice("delivered")}
           >
             <span>Delivered</span>
-            <span className="bg-green-400 absolute text-[10px] text-xs px-1.5 py-0.2 rounded-lg text-white right-2">New</span>
+            <span className="bg-green-400 absolute text-[10px] text-xs px-1.5 py-0.2 rounded-lg text-white right-1 top-0.5">New</span>
           </div>
 
         </div>

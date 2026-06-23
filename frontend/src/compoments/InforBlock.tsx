@@ -21,4 +21,4 @@ function InforBlock({tag, icon, item, setItem}: InforBlockProps){
   )
 }
 
-export default InforBlock
+export default InforBlock;
