@@ -1,6 +1,5 @@
 import InforBlock3 from "./InforBlock3";
 import { BedDouble, Bath, CarFront, Grid2x2Plus } from 'lucide-react';
-import Button from "./Button";
 import IconInput from "./IconInput";
 
 type PropertyDetailDialogProps = {
@@ -32,7 +31,7 @@ type PropertyDetailDialogProps = {
 function PropertyDetailDialog2({pstatus, type, bed, car, area, bath, address, location, city, zone, post, setLocation, setCity, setZone, setPost, setAddress, setDetail, setPstatus, setType, setCar, setBath, setBed, setArea}:PropertyDetailDialogProps){
   
   return (
-    <div className="inset-0 fixed bg-black/40 flex items-center justify-center">
+    <div className="inset-0 fixed bg-black/40 flex items-center justify-center z-100">
       <div className="flex flex-col bg-white w-[95%] rounded-2xl mt-13 h-[90vh] px-8 pb-4 pt-11 overflow-auto relative sm:w-160 sm:h-152">
         <div className="flex flex-col gap-1">
           <span className="text-xl font-bold">Property detail</span>

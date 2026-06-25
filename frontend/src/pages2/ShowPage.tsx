@@ -1,6 +1,16 @@
 import Cover from "../assets/Cover.png";
+import Puppy from "../assets/Puppy.png";
+import Star from "../assets/Star.png";
+import Bieber from "../assets/Bieber.png";
+import Micheal from "../assets/Micheal.png";
+import Black from "../assets/Black.png";
+import All from "../assets/All.png";
+import Hi from "../assets/Hi.png";
+import News from "../assets/News.png";
+import Flower from "../assets/Flower.png";
+import Her from "../assets/Her.png";
 import InforBlock2 from "../compoments/InforBlock2";
-import { BedDouble, Bath, CarFront, Grid2x2Plus, PhoneForwarded } from 'lucide-react';
+import { BedDouble, Bath, CarFront, Grid2x2Plus } from 'lucide-react';
 import { useState, useEffect } from "react";
 import map from "../assets/map.png"
 import MenuDialog from "../compoments/MenuDialog";
@@ -10,11 +20,21 @@ import { useNavigate } from "react-router-dom";
 import TopBar2 from "../compoments/TopBar2";
 import PropertyDetailDialog2 from "../compoments/PropertyDetailDialog2";
 import DescriptionDialog from "../compoments/DescriptionDialog";
+import SelectCoverDialog from "../compoments/SelectCoverDialog";
+import SelectPhotoDialog from "../compoments/SelectPhotoDialog";
+import SelectFloorDialog from "../compoments/SelectFloorDialog";
+import SelectVideoDialog from "../compoments/SelectVideoDialog";
 
 export type Section ={
   id: string;
   visible: boolean;
 }
+
+export type Selector ={
+  url: string;
+  isSelected: boolean
+}
+
 
 function ShowPage(){
   const navigate = useNavigate();
@@ -29,14 +49,14 @@ function ShowPage(){
   const [fnum, setFnum] = useState(1);
   const [ppage, setPpage] = useState(0);
   const [popen, setPopen] = useState(false);
-  const [photo, setPhoto] = useState<string[]>([Cover,Cover,Cover,Cover,Cover,Cover,Cover,Cover,Cover,Cover]);
+  const [photo, setPhoto] = useState<string[]>([Cover,Puppy,Her, Star, Bieber, Micheal, Black, Hi, News, All, Flower]);
   const [video, setVideo] = useState<string[]>([
-    Cover
+    Cover, Bieber, All, Puppy, Hi
   ]);
   const [vopen, setVopen] = useState(false);
   const [vpage, setVpage] = useState(0);
   const [floor, setFloor] = useState<string[]>([
-    Cover,Cover, Cover,Cover
+    Cover, News, Black, Bieber, Flower
   ]);
   const [fopen, setFopen] = useState(false);
   const [fpage, setFpage] = useState(0);
@@ -44,6 +64,17 @@ function ShowPage(){
   const [edit, setEdit] = useState(false);
   const [detail, setDetail] = useState(false);
   const [des, setDes] = useState(false);
+  const [cover, setCover] = useState("");
+  const [ophoto, setOphoto] = useState<Selector[]>([]);
+  const [ofloor, setOfloor] = useState<Selector[]>([]);
+  const [ovideo, setOvideo] = useState<Selector[]>([]);
+  const [selectedPhoto, setSelectedPhoto] = useState<string[]>(photo);
+  const [selectedFloor, setSelectedFloor] = useState<string[]>(floor);
+  const [selectedVideo, setSelectedVideo] = useState<string[]>(video);
+  const [selectc, setSelectc] = useState(false);
+  const [selectp, setSelectp] = useState(false);
+  const [selectf, setSelectf] = useState(false);
+  const [selectv, setSelectv] = useState(false);
 
   //const [debugLine, setDebugLine] = useState(30);
   const [pstatus, setPstatus] = useState<"sale" | "auction" | "rent">("sale");
@@ -57,6 +88,7 @@ function ShowPage(){
   const [city, setCity] = useState("");
   const [zone, setZone] = useState("");
   const [post, setPost] = useState("");
+
 
   const [sections, setSections] = useState<Section[]>([
     {id:"description", visible:true},
@@ -111,6 +143,7 @@ function ShowPage(){
       return true;
     }
   }
+
 
   const setVisible = (id:string) => {
     const newSections = sections.map(section => 
@@ -171,6 +204,26 @@ function ShowPage(){
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  useEffect(()=>{
+    const allPhotos = photo.map(p => (
+      {url: p, isSelected: false}
+    ))
+
+    setOphoto(allPhotos);
+
+    const allFloors = floor.map(f => (
+      {url: f, isSelected: false}
+    ))
+
+    setOfloor(allFloors);
+
+    const allVideos = video.map(v => (
+      {url: v, isSelected: false}
+    ))
+
+    setOvideo(allVideos);
+  },[])
 
 
   return (
@@ -284,7 +337,7 @@ function ShowPage(){
       <div className="w-full h-70 overflow-hidden relative sm:hidden">
         {edit && 
           <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3">
-            <button className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
+            <button onClick={()=>setSelectc(true)} className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                 <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
                 <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
@@ -295,7 +348,7 @@ function ShowPage(){
             <span className="text-sm text-gray-200">Select a cover media to be displayed on the first page</span>
           </div>
         }
-        <img src={photo[0]} alt="cover" className="w-full" />
+        <img src={cover ? cover : photo[0] } alt="cover" className="w-full"/>
       </div>
 
       <div className="flex flex-col items-center w-full pb-8 border border-gray-100 relative sm:hidden">
@@ -337,7 +390,7 @@ function ShowPage(){
         <div className="w-[62%] h-full relative">
           {edit && 
             <div className={`absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3 w-full ${edit ? "border-r-7 border-gray-100" : "border-0"}`}>
-              <button className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
+              <button onClick={()=>setSelectc(true)} className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                   <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
                   <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
@@ -348,7 +401,7 @@ function ShowPage(){
               <span className="text-sm text-gray-200">Select a cover media to be displayed on the first page</span>
             </div>
           }
-          <img src={photo[0]} alt="cover page" className={`w-full h-full object-cover`} />
+          <img src={cover ? cover : photo[0] } alt="cover page" className={`w-full h-full object-cover`} />
         </div>
 
         <div className="h-full flex-1 bg-amber-950 flex flex-col items-center pb-18 pt-14 relative">
@@ -427,7 +480,7 @@ function ShowPage(){
           {photo.length > 0 && section.id === "photo" && 
             <div id="photo" className="flex flex-col items-center py-6 w-full relative sm:py-11">
               {edit && 
-                <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3">
+                <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3 z-30">
                   <div className="flex absolute right-3 top-2 gap-1 sm:top-3 sm:right-6">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`size-6 sm:size-10 ${index === 0 ? "text-black/40" : "text-white hover:text-gray-200 active:text-gray-300 "}`} onClick={()=>moveUp("photo")}>
                       <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm.53 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v5.69a.75.75 0 0 0 1.5 0v-5.69l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clipRule="evenodd" />
@@ -443,7 +496,7 @@ function ShowPage(){
                     </svg>
 
                   </div>
-                  <button className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
+                  <button onClick={()=>setSelectp(true)} className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                       <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
                       <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
@@ -457,18 +510,18 @@ function ShowPage(){
 
               <span className="font-['Playfair_Display'] font-bold text-xl pb-4 sm:text-3xl">Photography</span>
 
-              {photo.length === 1 && 
+              {selectedPhoto.length === 1 && 
                 <div className="w-full h-60 px-2 lg:px-60 sm:h-150" onClick={()=>{
                   setPpage(0);
                   setPopen(true);
                 }}>
-                  <img src={photo[0]} alt="photo" className="w-full h-full object-cover" />
+                  <img src={selectedPhoto[0]} alt="photo" className="w-full h-full object-cover" />
                 </div>
               }
 
-              {photo.length === 2 && 
+              {selectedPhoto.length === 2 && 
                 <div className="px-2 w-full gap-2 flex lg:px-60">
-                  {photo.map((p, index) => (
+                  {selectedPhoto.map((p, index) => (
                     <div className="w-full h-30 sm:h-130" key={index} onClick={()=>{
                       setPpage(index);
                       setPopen(true);
@@ -479,21 +532,21 @@ function ShowPage(){
                 </div>
               }
 
-              {photo.length === 3 && 
+              {selectedPhoto.length === 3 && 
                 <div className="px-2 w-full gap-2 flex flex-col lg:px-60">
                   <div className="w-full h-50 sm:h-150" onClick={()=>{
                     setPpage(0);
                     setPopen(true);
                   }}>
-                    <img src={photo[0]} alt="photo" className="w-full h-full object-cover" />
+                    <img src={selectedPhoto[0]} alt="photo" className="w-full h-full object-cover" />
                   </div>
 
                   <div className="w-full h-30 grid grid-cols-2 gap-2 sm:h-80">
-                    <img src={photo[1]} alt="photo" className="w-full h-80 object-cover" onClick={()=>{
+                    <img src={selectedPhoto[1]} alt="photo" className="w-full h-30 sm:h-80 object-cover" onClick={()=>{
                       setPpage(1);
                       setPopen(true);
                     }}/>
-                    <img src={photo[2]} alt="photo" className="w-full h-80 object-cover" onClick={()=>{
+                    <img src={selectedPhoto[2]} alt="photo" className="w-full h-30 sm:h-80 object-cover" onClick={()=>{
                       setPpage(2);
                       setPopen(true);
                     }}/>
@@ -501,9 +554,9 @@ function ShowPage(){
                 </div>
               }
 
-              {photo.length === 4 && 
+              {selectedPhoto.length === 4 && 
                 <div className="px-2 w-full gap-2 grid grid-cols-2 lg:px-60">
-                  {photo.map((p, index) => (
+                  {selectedPhoto.map((p, index) => (
                     <div className="w-full h-full sm:h-90" key={index} onClick={()=>{
                       setPpage(index);
                       setPopen(true);
@@ -514,21 +567,21 @@ function ShowPage(){
                 </div>
               }
 
-              {photo.length === 5 && 
+              {selectedPhoto.length === 5 && 
                 <div className="px-2 w-full gap-2 flex flex-col lg:px-60">
                   <div className="grid grid-cols-[3fr_2fr] gap-2 w-full">
                     <div className="w-full h-40 sm:h-100" onClick={()=>{
                       setPpage(0);
                       setPopen(true);
                     }}>
-                      <img src={photo[0]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[0]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-40 sm:h-100" onClick={()=>{
                       setPpage(1);
                       setPopen(true);
                     }}>
-                      <img src={photo[1]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[1]} className="w-full h-full object-cover" />
                     </div>
                   </div>
 
@@ -537,41 +590,41 @@ function ShowPage(){
                       setPpage(2);
                       setPopen(true);
                     }}>
-                      <img src={photo[2]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[2]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-20 sm:h-70" onClick={()=>{
                       setPpage(3);
                       setPopen(true);
                     }}>
-                      <img src={photo[3]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[3]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-20 sm:h-70" onClick={()=>{
                       setPpage(4);
                       setPopen(true);
                     }}>
-                      <img src={photo[4]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[4]} className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>
               }
 
-              {photo.length === 6 && 
+              {selectedPhoto.length === 6 && 
                 <div className="px-2 w-full gap-2 flex flex-col lg:px-60">
                   <div className="grid grid-cols-[3fr_2fr] gap-2 w-full">
                     <div className="w-full h-40 sm:h-90" onClick={()=>{
                       setPpage(0);
                       setPopen(true);
                     }}>
-                      <img src={photo[0]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[0]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-40 sm:h-90" onClick={()=>{
                       setPpage(1);
                       setPopen(true);
                     }}>
-                      <img src={photo[1]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[1]} className="w-full h-full object-cover" />
                     </div>
                   </div>
 
@@ -580,21 +633,21 @@ function ShowPage(){
                       setPpage(2);
                       setPopen(true);
                     }}>
-                      <img src={photo[2]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[2]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-20 sm:h-70" onClick={()=>{
                       setPpage(3);
                       setPopen(true);
                     }}>
-                      <img src={photo[3]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[3]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-20 sm:h-70" onClick={()=>{
                       setPpage(4);
                       setPopen(true);
                     }}>
-                      <img src={photo[4]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[4]} className="w-full h-full object-cover" />
                     </div>
                   </div>
 
@@ -602,26 +655,26 @@ function ShowPage(){
                       setPpage(5);
                       setPopen(true);
                     }}>
-                    <img src={photo[5]} className="w-full h-full object-cover" />
+                    <img src={selectedPhoto[5]} className="w-full h-full object-cover" />
                   </div>
                 </div>
               }
 
-              {photo.length === 7 && 
+              {selectedPhoto.length === 7 && 
                 <div className="px-2 w-full gap-2 flex flex-col lg:px-60">
                   <div className="grid grid-cols-[3fr_2fr] gap-2 w-full">
                     <div className="w-full h-40 sm:h-90" onClick={()=>{
                       setPpage(0);
                       setPopen(true);
                     }}>
-                      <img src={photo[0]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[0]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-40 sm:h-90" onClick={()=>{
                       setPpage(1);
                       setPopen(true);
                     }}>
-                      <img src={photo[1]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[1]} className="w-full h-full object-cover" />
                     </div>
                   </div>
 
@@ -630,21 +683,21 @@ function ShowPage(){
                       setPpage(2);
                       setPopen(true);
                     }}>
-                      <img src={photo[2]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[2]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-20 sm:h-70" onClick={()=>{
                       setPpage(3);
                       setPopen(true);
                     }}>
-                      <img src={photo[3]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[3]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-20 sm:h-70" onClick={()=>{
                       setPpage(4);
                       setPopen(true);
                     }}>
-                      <img src={photo[4]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[4]} className="w-full h-full object-cover" />
                     </div>
                   </div>
 
@@ -653,42 +706,42 @@ function ShowPage(){
                       setPpage(5);
                       setPopen(true);
                     }}>
-                      <img src={photo[5]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[5]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-40 sm:h-80" onClick={()=>{
                       setPpage(6);
                       setPopen(true);
                     }}>
-                      <img src={photo[6]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[6]} className="w-full h-full object-cover" />
                     </div>
                   </div>
 
                 </div>
               }
 
-              {photo.length === 8 && 
+              {selectedPhoto.length === 8 && 
                 <div className="px-2 w-full gap-2 flex flex-col lg:px-60">
                   <div className="grid grid-cols-[1fr_1fr_1fr] w-full gap-2">
                     <div className="w-full h-20 sm:h-60" onClick={()=>{
                       setPpage(0);
                       setPopen(true);
                     }}>
-                      <img src={photo[0]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[0]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-20 sm:h-60" onClick={()=>{
                       setPpage(1);
                       setPopen(true);
                     }}>
-                      <img src={photo[1]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[1]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-20 sm:h-60" onClick={()=>{
                       setPpage(2);
                       setPopen(true);
                     }}>
-                      <img src={photo[2]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[2]} className="w-full h-full object-cover" />
                     </div>
                   </div>
 
@@ -697,14 +750,14 @@ function ShowPage(){
                       setPpage(3);
                       setPopen(true);
                     }}>
-                      <img src={photo[3]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[3]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-40 sm:h-100" onClick={()=>{
                       setPpage(4);
                       setPopen(true);
                     }}>
-                      <img src={photo[4]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[4]} className="w-full h-full object-cover" />
                     </div>
                   </div>
 
@@ -713,27 +766,27 @@ function ShowPage(){
                       setPpage(5);
                       setPopen(true);
                     }}>
-                      <img src={photo[5]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[5]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-20 sm:h-60" onClick={()=>{
                       setPpage(6);
                       setPopen(true);
                     }}>
-                      <img src={photo[6]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[6]} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-20 sm:h-60" onClick={()=>{
                       setPpage(7);
                       setPopen(true);
                     }}>
-                      <img src={photo[7]} className="w-full h-full object-cover" />
+                      <img src={selectedPhoto[7]} className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>
               }
 
-              {photo.length === 9 && 
+              {selectedPhoto.length === 9 && 
                 <div className="w-full flex flex-col">
                   <div className="flex flex-col w-full px-2 gap-2 lg:px-60">
                     <div className="grid grid-cols-[3fr_2fr] gap-2 w-full">
@@ -741,14 +794,14 @@ function ShowPage(){
                         setPpage(0);
                         setPopen(true);
                       }}>
-                        <img src={photo[0]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[0]} className="w-full h-full object-cover" />
                       </div>
 
                       <div className="w-full h-40 sm:h-100" onClick={()=>{
                         setPpage(1);
                         setPopen(true);
                       }}>
-                        <img src={photo[1]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[1]} className="w-full h-full object-cover" />
                       </div>
                     </div>
 
@@ -757,21 +810,21 @@ function ShowPage(){
                         setPpage(2);
                         setPopen(true);
                       }}>
-                        <img src={photo[2]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[2]} className="w-full h-full object-cover" />
                       </div>
 
                       <div className="w-full h-20 sm:h-60" onClick={()=>{
                         setPpage(3);
                         setPopen(true);
                       }}>
-                        <img src={photo[3]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[3]} className="w-full h-full object-cover" />
                       </div>
 
                       <div className="w-full h-20 sm:h-60" onClick={()=>{
                         setPpage(4);
                         setPopen(true);
                       }}>
-                        <img src={photo[4]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[4]} className="w-full h-full object-cover" />
                       </div>
                     </div>
                   </div>
@@ -783,14 +836,14 @@ function ShowPage(){
                           setPpage(5);
                           setPopen(true);
                         }}>
-                          <img src={photo[5]} className="w-full h-full object-cover" />
+                          <img src={selectedPhoto[5]} className="w-full h-full object-cover" />
                         </div>
 
                         <div className="w-full h-full" onClick={()=>{
                           setPpage(6);
                           setPopen(true);
                         }}>
-                          <img src={photo[6]} className="w-full h-full object-cover" />
+                          <img src={selectedPhoto[6]} className="w-full h-full object-cover" />
                         </div>
                       </div>
 
@@ -798,21 +851,21 @@ function ShowPage(){
                         setPpage(7);
                         setPopen(true);
                       }}>
-                        <img src={photo[7]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[7]} className="w-full h-full object-cover" />
                       </div>
 
                       <div className="w-full h-40 sm:h-120" onClick={()=>{
                         setPpage(8);
                         setPopen(true);
                       }}>
-                        <img src={photo[8]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[8]} className="w-full h-full object-cover" />
                       </div>
                     </div>
                   </div>
                 </div>
               }
 
-              {photo.length > 9 && 
+              {selectedPhoto.length > 9 && 
                 <div className="w-full flex flex-col">
                   <div className="flex flex-col w-full px-2 gap-2 lg:px-60">
                     <div className="grid grid-cols-[3fr_2fr] gap-2 w-full">
@@ -820,14 +873,14 @@ function ShowPage(){
                         setPpage(0);
                         setPopen(true);
                       }}>
-                        <img src={photo[0]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[0]} className="w-full h-full object-cover" />
                       </div>
 
                       <div className="w-full h-40 sm:h-100" onClick={()=>{
                         setPpage(1);
                         setPopen(true);
                       }}>
-                        <img src={photo[1]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[1]} className="w-full h-full object-cover" />
                       </div>
                     </div>
 
@@ -836,21 +889,21 @@ function ShowPage(){
                         setPpage(2);
                         setPopen(true);
                       }}>
-                        <img src={photo[2]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[2]} className="w-full h-full object-cover" />
                       </div>
 
                       <div className="w-full h-20 sm:h-60" onClick={()=>{
                         setPpage(3);
                         setPopen(true);
                       }}>
-                        <img src={photo[3]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[3]} className="w-full h-full object-cover" />
                       </div>
 
                       <div className="w-full h-20 sm:h-60" onClick={()=>{
                         setPpage(4);
                         setPopen(true);
                       }}>
-                        <img src={photo[4]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[4]} className="w-full h-full object-cover" />
                       </div>
                     </div>
                   </div>
@@ -862,14 +915,14 @@ function ShowPage(){
                           setPpage(5);
                           setPopen(true);
                         }}>
-                          <img src={photo[5]} className="w-full h-full object-cover" />
+                          <img src={selectedPhoto[5]} className="w-full h-full object-cover" />
                         </div>
 
                         <div className="w-full h-full" onClick={()=>{
                           setPpage(6);
                           setPopen(true);
                         }}>
-                          <img src={photo[6]} className="w-full h-full object-cover" />
+                          <img src={selectedPhoto[6]} className="w-full h-full object-cover" />
                         </div>
                       </div>
 
@@ -877,14 +930,14 @@ function ShowPage(){
                         setPpage(7);
                         setPopen(true);
                       }}>
-                        <img src={photo[7]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[7]} className="w-full h-full object-cover" />
                       </div>
 
                       <div className="w-full h-40 sm:h-120 relative" onClick={()=>{
                         setPpage(8);
                         setPopen(true);
                       }}>
-                        <img src={photo[8]} className="w-full h-full object-cover" />
+                        <img src={selectedPhoto[8]} className="w-full h-full object-cover" />
 
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center hover:bg-black/60 active:bg-black/70">
                           <span className="text-6xl text-white/80 font-bold">{`+${photo.length - 9}`}</span>
@@ -901,7 +954,7 @@ function ShowPage(){
           {floor.length > 0 && section.id === "floor" &&
             <div id="floor" className="flex flex-col items-center py-6 border-t relative border-b border-gray-100 w-full px-2 sm:border-b-7 sm:border-t-7 lg:px-60 sm:pb-12">
               {edit && 
-                <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3">
+                <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3 z-30">
                   <div className="flex absolute right-3 top-2 gap-1 sm:top-3 sm:right-6">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`size-6 sm:size-10 ${index === 0 ? "text-black/40" : "text-white hover:text-gray-200 active:text-gray-300 "}`} onClick={()=>moveUp("floor")}>
                       <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm.53 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v5.69a.75.75 0 0 0 1.5 0v-5.69l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clipRule="evenodd" />
@@ -916,7 +969,7 @@ function ShowPage(){
                       <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <button className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
+                  <button onClick={()=>setSelectf(true)} className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                       <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
                       <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
@@ -929,40 +982,40 @@ function ShowPage(){
               }
               <span className="font-['Playfair_Display'] font-bold text-xl pb-4 sm:text-3xl sm:py-6">Floor Plans</span>
               
-              {floor.length === 1 &&
+              {selectedFloor.length === 1 &&
                 <div className="h-65 w-full sm:h-180" onClick={()=>{
                   setFopen(true);
                   setFpage(0);
                 }}>
-                  <img src={floor[0]} alt="photo" className="h-full w-full object-cover"/>
+                  <img src={selectedFloor[0]} alt="photo" className="h-full w-full object-cover"/>
                 </div>
               }
 
-              {floor.length === 2 &&
+              {selectedFloor.length === 2 &&
                 <div className="grid grid-cols-2 w-full gap-2">
                   <div className="w-full h-40 sm:h-100" onClick={()=>{
                     setFopen(true);
                     setFpage(0);
                   }}>
-                    <img src={floor[0]} alt="photo" className="w-full h-full object-cover" />
+                    <img src={selectedFloor[0]} alt="photo" className="w-full h-full object-cover" />
                   </div>
 
                   <div className="w-full h-40 sm:h-100" onClick={()=>{
                     setFopen(true);
                     setFpage(1);
                   }}>
-                    <img src={floor[1]} alt="photo" className="w-full h-full object-cover" />
+                    <img src={selectedFloor[1]} alt="photo" className="w-full h-full object-cover" />
                   </div>
                 </div>
               }
 
-              {floor.length === 3 &&
+              {selectedFloor.length === 3 &&
                 <div className="flex flex-col w-full gap-2">
                   <div className="w-full h-50 sm:h-150" onClick={()=>{
                     setFopen(true);
                     setFpage(0);
                   }}>
-                    <img src={floor[0]} alt="photo" className="w-full h-full object-cover" />
+                    <img src={selectedFloor[0]} alt="photo" className="w-full h-full object-cover" />
                   </div>
 
                   <div className="grid grid-cols-2 w-full gap-2">
@@ -970,26 +1023,26 @@ function ShowPage(){
                       setFopen(true);
                       setFpage(1);
                     }}>
-                      <img src={floor[1]} alt="photo" className="w-full h-full object-cover" />
+                      <img src={selectedFloor[1]} alt="photo" className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-40 sm:h-100" onClick={()=>{
                       setFopen(true);
                       setFpage(2);
                     }}>
-                      <img src={floor[2]} alt="photo" className="w-full h-full object-cover" />
+                      <img src={selectedFloor[2]} alt="photo" className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>
               }
 
-              {floor.length > 3 &&
+              {selectedFloor.length > 3 &&
                 <div className="flex flex-col w-full gap-2">
                   <div className="w-full h-50 sm:h-150" onClick={()=>{
                     setFopen(true);
                     setFpage(0);
                   }}>
-                    <img src={floor[0]} alt="photo" className="w-full h-full object-cover" />
+                    <img src={selectedFloor[0]} alt="photo" className="w-full h-full object-cover" />
                   </div>
 
                   <div className="grid grid-cols-2 w-full gap-2">
@@ -997,14 +1050,14 @@ function ShowPage(){
                       setFopen(true);
                       setFpage(1);
                     }}>
-                      <img src={floor[1]} alt="photo" className="w-full h-full object-cover" />
+                      <img src={selectedFloor[1]} alt="photo" className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-40 sm:h-100 relative" onClick={()=>{
                       setFopen(true);
                       setFpage(2);
                     }}>
-                      <img src={floor[2]} alt="photo" className="w-full h-full object-cover" />
+                      <img src={selectedFloor[2]} alt="photo" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center hover:bg-black/60 active:bg-black/70">
                         <span className="text-6xl text-white/80 font-bold">{`+${floor.length - 3}`}</span>
                       </div>
@@ -1018,7 +1071,7 @@ function ShowPage(){
           {video.length > 0 && section.id === "video" &&
             <div id="video" className="flex flex-col items-center py-6 relative border-b border-gray-100 w-full px-2 lg:px-60 sm:pb-13 sm:border-b-7">
               {edit && 
-                <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3">
+                <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3 z-30">
                   <div className="flex absolute right-3 top-2 gap-1 sm:top-3 sm:right-6">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`size-6 sm:size-10 ${index === 0 ? "text-black/40" : "text-white hover:text-gray-200 active:text-gray-300 "}`} onClick={()=>moveUp("video")}>
                       <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm.53 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v5.69a.75.75 0 0 0 1.5 0v-5.69l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clipRule="evenodd" />
@@ -1033,7 +1086,7 @@ function ShowPage(){
                       <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <button className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
+                  <button onClick={()=>setSelectv(true)} className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                       <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
                       <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
@@ -1047,40 +1100,40 @@ function ShowPage(){
 
               <span className="font-['Playfair_Display'] font-bold text-xl pb-4 sm:text-3xl sm:py-6">Videography</span>
               
-              {video.length === 1 &&
+              {selectedVideo.length === 1 &&
                 <div className="h-65 w-full sm:h-150" onClick={()=>{
                   setVopen(true);
                   setVpage(0);
                 }}>
-                  <img src={video[0]} alt="photo" className="h-full w-full object-cover"/>
+                  <img src={selectedVideo[0]} alt="photo" className="h-full w-full object-cover"/>
                 </div>
               }
 
-              {video.length === 2 &&
+              {selectedVideo.length === 2 &&
                 <div className="grid grid-cols-2 w-full gap-2">
                   <div className="w-full h-40 sm:h-100" onClick={()=>{
                     setVopen(true);
                     setVpage(0);
                   }}>
-                    <img src={video[0]} alt="photo" className="w-full h-full object-cover" />
+                    <img src={selectedVideo[0]} alt="photo" className="w-full h-full object-cover" />
                   </div>
 
                   <div className="w-full h-40 sm:h-100" onClick={()=>{
                     setVopen(true);
                     setVpage(1);
                   }}>
-                    <img src={video[1]} alt="photo" className="w-full h-full object-cover" />
+                    <img src={selectedVideo[1]} alt="photo" className="w-full h-full object-cover" />
                   </div>
                 </div>
               }
 
-              {video.length === 3 &&
+              {selectedVideo.length === 3 &&
                 <div className="flex flex-col w-full gap-2">
                   <div className="w-full h-50 sm:h-150" onClick={()=>{
                     setVopen(true);
                     setVpage(0);
                   }}>
-                    <img src={video[0]} alt="photo" className="w-full h-full object-cover" />
+                    <img src={selectedVideo[0]} alt="photo" className="w-full h-full object-cover" />
                   </div>
 
                   <div className="grid grid-cols-2 w-full gap-2">
@@ -1088,26 +1141,26 @@ function ShowPage(){
                       setVopen(true);
                       setVpage(1);
                     }}>
-                      <img src={video[1]} alt="photo" className="w-full h-full object-cover" />
+                      <img src={selectedVideo[1]} alt="photo" className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-40 sm:h-100" onClick={()=>{
                       setVopen(true);
                       setVpage(2);
                     }}>
-                      <img src={video[2]} alt="photo" className="w-full h-full object-cover" />
+                      <img src={selectedVideo[2]} alt="photo" className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>
               }
 
-              {video.length > 3 &&
+              {selectedVideo.length > 3 &&
                 <div className="flex flex-col w-full gap-2">
                   <div className="w-full h-50 sm:h-150" onClick={()=>{
                     setVopen(true);
                     setVpage(0);
                   }}>
-                    <img src={video[0]} alt="photo" className="w-full h-full object-cover" />
+                    <img src={selectedVideo[0]} alt="photo" className="w-full h-full object-cover" />
                   </div>
 
                   <div className="grid grid-cols-2 w-full gap-2">
@@ -1115,14 +1168,14 @@ function ShowPage(){
                       setVopen(true);
                       setVpage(1);
                     }}>
-                      <img src={video[1]} alt="photo" className="w-full h-full object-cover" />
+                      <img src={selectedVideo[1]} alt="photo" className="w-full h-full object-cover" />
                     </div>
 
                     <div className="w-full h-40 sm:h-100 relative" onClick={()=>{
                       setVopen(true);
                       setVpage(2);
                     }}>
-                      <img src={video[2]} alt="photo" className="w-full h-full object-cover" />
+                      <img src={selectedVideo[2]} alt="photo" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center hover:bg-black/60 active:bg-black/70">
                         <span className="text-6xl text-white/80 font-bold">{`+${video.length - 3}`}</span>
                       </div>
@@ -1216,6 +1269,10 @@ function ShowPage(){
       {vopen && <PhotoDisplayDialog list={video} setOpen={setVopen} page={vpage} setPage={setVpage} />}
       {detail && <PropertyDetailDialog2 pstatus={pstatus} type={type} bed={bed} car={car} area={area} bath={bath} setDetail={setDetail} setPstatus={setPstatus} setType={setType} setBed={setBed} setArea={setArea} setBath={setBath} setCar={setCar} address={address} setAddress={setAddress} location={location} setLocation={setLocation} city={city} setCity={setCity} zone={zone} setZone={setZone} post={post} setPost={setPost} />}
       {des && <DescriptionDialog setDes={setDes} description={description} setDescription={setDescription} />}
+      {selectc && <SelectCoverDialog setSelectc={setSelectc} setCover={setCover} photo={photo} video={video} cover={cover} />}
+      {selectp && <SelectPhotoDialog setSelectp={setSelectp} ophoto={ophoto} setOphoto={setOphoto} setSelectedPhoto={setSelectedPhoto} />}
+      {selectf && <SelectFloorDialog setSelectf={setSelectf} ofloor={ofloor} setOfloor={setOfloor} setSelectedFloor={setSelectedFloor} />}
+      {selectv && <SelectVideoDialog  setSelectv={setSelectv} ovideo={ovideo} setOvideo={setOvideo} setSelectedVideo={setSelectedVideo} />}
     </div>
   )
 }
