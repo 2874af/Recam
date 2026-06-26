@@ -32,7 +32,7 @@ function PropertyDetailDialog2({pstatus, type, bed, car, area, bath, address, lo
   
   return (
     <div className="inset-0 fixed bg-black/40 flex items-center justify-center z-100">
-      <div className="flex flex-col bg-white w-[95%] rounded-2xl mt-13 h-[90vh] px-8 pb-4 pt-11 overflow-auto relative sm:w-160 sm:h-152">
+      <div className="flex flex-col bg-white w-[95%] rounded-2xl h-[90vh] px-8 pb-4 pt-11 overflow-auto relative sm:w-160 sm:h-152">
         <div className="flex flex-col gap-1">
           <span className="text-xl font-bold">Property detail</span>
           <span className="text-gray-500 text-[10px]">Please take a moment to review and complete property details.</span>

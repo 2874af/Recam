@@ -8,7 +8,7 @@ type DescriptionDialogProps ={
 function DescriptionDialog({setDes, description, setDescription}:DescriptionDialogProps){
   return (
     <div className="fixed inset-0 bg-black/40 justify-center items-center flex z-100">
-      <div className="flex flex-col bg-white w-[95%] rounded-2xl mt-13 h-[80vh] px-8 pb-5 pt-14 overflow-auto relative sm:w-180">
+      <div className="flex flex-col bg-white w-[95%] rounded-2xl h-[80vh] px-8 pb-5 pt-14 overflow-auto relative sm:w-180">
         <div className="flex flex-col gap-1">
           <span className="text-xl font-bold">Property Description</span>
           <span className="text-gray-500 text-[10px]">Please describe the key features and highlights the property.</span>

@@ -24,6 +24,10 @@ import SelectCoverDialog from "../compoments/SelectCoverDialog";
 import SelectPhotoDialog from "../compoments/SelectPhotoDialog";
 import SelectFloorDialog from "../compoments/SelectFloorDialog";
 import SelectVideoDialog from "../compoments/SelectVideoDialog";
+import CreateAgentDialog from "../compoments/CreateAgentDialog";
+import CreateAgentDialog2 from "../pages/CreateAgentDialog2";
+import { Mail, Phone } from 'lucide-react';
+import EditAgentDialog from "../compoments/EditAgentDialog";
 
 export type Section ={
   id: string;
@@ -35,8 +39,38 @@ export type Selector ={
   isSelected: boolean
 }
 
+export type AgentType = {
+  firstname: string;
+  lastname: string;
+  email: string;
+  phone: string;
+  office: string;
+  media: string;
+  isSelected: boolean
+}
+
 
 function ShowPage(){
+  const agent1 = {
+    firstname: "Justin",
+    lastname: "Bieber",
+    email: "justin@outlook.com",
+    phone: "12345678",
+    office: "RayWhite",
+    isSelected: false,
+    media: Cover,
+  };
+
+  const agent2 = {
+    firstname: "Micheal",
+    lastname: "Jackson",
+    email: "micheal@outlook.com",
+    phone: "12345678",
+    office: "RayWhite",
+    isSelected: false,
+    media: Hi,
+  }
+
   const navigate = useNavigate();
   const [description, setDescription] = useState("");
   const [contact, setContact] = useState("");
@@ -75,6 +109,11 @@ function ShowPage(){
   const [selectp, setSelectp] = useState(false);
   const [selectf, setSelectf] = useState(false);
   const [selectv, setSelectv] = useState(false);
+  const [aopen, setAopen] = useState(false);
+  const [editAgent, setEditAgent] = useState(false);
+  const [createAgent, setCreateAgent] = useState(false);
+  const [agent, setAgent] = useState<AgentType[]>([agent1, agent2, agent1, agent2, agent1, agent1, agent2, agent1]);
+  const [selectedAgent, setSelectedAgent] = useState<AgentType[]>([]);
 
   //const [debugLine, setDebugLine] = useState(30);
   const [pstatus, setPstatus] = useState<"sale" | "auction" | "rent">("sale");
@@ -88,6 +127,15 @@ function ShowPage(){
   const [city, setCity] = useState("");
   const [zone, setZone] = useState("");
   const [post, setPost] = useState("");
+
+  const [media, setMedia] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [office, setOffice] = useState("");
+  const [isSelected, setIsSelected] = useState(false);
+  const [aindex, setAindex] = useState(0);
 
 
   const [sections, setSections] = useState<Section[]>([
@@ -1242,7 +1290,7 @@ function ShowPage(){
                       <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <button className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
+                  <button onClick={()=>setAopen(true)} className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                       <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
                       <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
@@ -1254,8 +1302,38 @@ function ShowPage(){
                 </div>
               }
               <span className="font-['Playfair_Display'] font-bold text-xl pb-4 sm:text-3xl">Contact</span>
-              <span className="text-xs text-gray-500 font-light pb-3 sm:text-sm">{`${contact ? {contact} : "Please add agent contact information" }`}</span>
-              <span className="underline text-xs hover:text-gray-400 active:text-gray-500 sm:text-sm">Click to add</span>
+              {agent.length === 0
+                ?
+                  <span className="text-xs text-gray-500 font-light pb-3 sm:text-sm">{`${contact ? {contact} : "Please add agent contact information" }`}</span>
+                :
+                  <div className="flex flex-col w-full px-4 gap-3 sm:grid sm:grid-cols-3 sm:gap-7 sm:px-15">
+                    {selectedAgent.map((a, index) => (
+                      <div key={index} className="w-full h-33 bg-gray-100 flex items-center px-4 py-3 rounded-xl">
+                        <img src={a.media} alt="media" className="rounded-full w-18 h-18 mr-4" />
+
+                        <div className="w-full h-full border-l-2 border-gray-200 flex flex-col">
+                          <div className="flex flex-col px-3 border-b-2 border-gray-200 h-[50%]">
+                            <span className="font-bold text-lg">{`${a.firstname} ${a.lastname}`}</span>
+                            <span className="text-sm text-gray-500">{a.office}</span>
+                          </div>
+
+                          <div className="flex-1 flex flex-col w-full px-3 pt-1.5 gap-1 h-[50%] justify-center">
+                            <div className="flex items-center gap-1">
+                              <Mail className="w-3 h-3 text-gray-500" />
+                              <span className="text-sm text-gray-500">{a.email}</span>
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                              <Phone className="w-3 h-3 text-gray-500" />
+                              <span className="text-sm text-gray-500">{a.phone}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+              }
+              <span className="underline mt-3 text-xs hover:text-gray-400 active:text-gray-500 sm:text-sm">Click to add</span>
             </div>
           }
         </div>
@@ -1273,6 +1351,9 @@ function ShowPage(){
       {selectp && <SelectPhotoDialog setSelectp={setSelectp} ophoto={ophoto} setOphoto={setOphoto} setSelectedPhoto={setSelectedPhoto} />}
       {selectf && <SelectFloorDialog setSelectf={setSelectf} ofloor={ofloor} setOfloor={setOfloor} setSelectedFloor={setSelectedFloor} />}
       {selectv && <SelectVideoDialog  setSelectv={setSelectv} ovideo={ovideo} setOvideo={setOvideo} setSelectedVideo={setSelectedVideo} />}
+      {aopen && <CreateAgentDialog setOpen={setAopen} agent={agent} setAgent={setAgent} setCreateAgent={setCreateAgent} setSelectedAgent={setSelectedAgent} setEditAgent={setEditAgent} setEmail={setEmail} setFirstname={setFirstname} setLastname={setLastname} setMedia={setMedia} setOffice={setOffice} setPhone={setPhone} setIsSelected={setIsSelected} setAindex={setAindex} />}
+      {createAgent && <CreateAgentDialog2 setCreateAgent={setCreateAgent} setAopen={setAopen} agent={agent} setAgent={setAgent} />}
+      {editAgent && <EditAgentDialog setAopen={setAopen} setEditAgent={setEditAgent} agent={agent} setAgent={setAgent} initialMedia={media} initialEmail={email} initialFirstname={firstname} initialLastname={lastname} initialOffice={office} initialPhone={phone} index={aindex} initialIsSelected={isSelected} />}
     </div>
   )
 }
