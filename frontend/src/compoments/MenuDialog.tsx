@@ -7,18 +7,37 @@ type MenuDialogProps ={
   photo: boolean;
   video: boolean;
   floor: boolean;
+  description: boolean;
+  selectedPhoto: boolean;
+  selectedFloor: boolean;
+  selectedVideo: boolean;
+  selectedAgent: boolean;
   vr: boolean;
   setEdit: React.Dispatch<React.SetStateAction<boolean>>;
   sections: Section[];
   edit: boolean;
+  preview: boolean;
+  setPreview: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function MenuDialog({setMenu, choice, onClick, photo, video, floor, vr, setEdit, sections, edit}:MenuDialogProps){
+function MenuDialog({setMenu, choice, onClick, photo, video, floor, vr, setEdit, sections, edit, preview, setPreview, description,selectedPhoto, selectedAgent, selectedFloor, selectedVideo}:MenuDialogProps){
   return (
     <div className="fixed inset-0 bg-black/40 flex z-100">
       <div className="h-full w-50 bg-white flex flex-col items-center py-7 gap-2">
         <button onClick={()=>{
+          setEdit(false);
+          setPreview(false);
+          setMenu(false);
+        }} className={`bg-black text-white flex items-center justify-center rounded-2xl py-2 gap-1 w-30 text-xs hover:bg-gray-700 active:bg-gray-500 ${(edit || preview) ? "block" : "hidden"}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-4">
+            <path fillRule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm10.72 4.72a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H9a.75.75 0 0 1 0-1.5h10.94l-1.72-1.72a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+          </svg>
+          <span>Exit</span>
+        </button>
+
+        <button onClick={()=>{
           setEdit(true);
+          setPreview(false);
           setMenu(false);
         }} className={`bg-black text-white flex items-center justify-center rounded-2xl py-2 gap-1 w-30 text-xs hover:bg-gray-700 active:bg-gray-500 ${edit ? "hidden" : "block"}`}>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-4">
@@ -30,16 +49,10 @@ function MenuDialog({setMenu, choice, onClick, photo, video, floor, vr, setEdit,
         </button>
 
         <button onClick={()=>{
+          setPreview(true);
           setEdit(false);
           setMenu(false);
-        }} className={`bg-black text-white flex items-center justify-center rounded-2xl py-2 gap-1 w-30 text-xs hover:bg-gray-700 active:bg-gray-500 ${edit ? "block" : "hidden"}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-4">
-            <path fillRule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm10.72 4.72a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H9a.75.75 0 0 1 0-1.5h10.94l-1.72-1.72a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-          </svg>
-          <span>Exit</span>
-        </button>
-
-        <button className="bg-black text-white flex items-center justify-center rounded-2xl py-2 gap-1 w-30 text-xs hover:bg-gray-700 active:bg-gray-500">
+        }}className={`bg-black text-white flex items-center justify-center rounded-2xl py-2 gap-1 w-30 text-xs hover:bg-gray-700 active:bg-gray-500 ${preview ? "hidden" : "block"}`}>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-4">
             <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
             <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clipRule="evenodd" />
@@ -65,7 +78,9 @@ function MenuDialog({setMenu, choice, onClick, photo, video, floor, vr, setEdit,
         <div className="flex flex-col mt-6 gap-2">
           {sections.map((section, index)=>(
             <div key={index}>
-              {section.id === "description" &&
+              {section.id === "description" && (preview === false || (preview === true && description && 
+                sections.find(s => s.id === "description")?.visible === true
+              )) &&
                 <div onClick={()=>onClick("description")} id="description" className={`w-34 flex justify-center items-center rounded-lg py-1 hover:bg-gray-200 active:bg-gray-300 ${
                   choice === "description"
                     ? "bg-gray-200"
@@ -75,7 +90,9 @@ function MenuDialog({setMenu, choice, onClick, photo, video, floor, vr, setEdit,
                 </div>
               }
 
-              {photo && section.id === "photo" &&
+              {photo && section.id === "photo" && (preview === false || (preview === true && selectedPhoto && 
+                sections.find(s => s.id === "photo")?.visible === true
+              )) &&
                 <div onClick={()=>onClick("photo")} id="photo" className={`w-34 flex justify-center items-center rounded-lg hover:bg-gray-200 active:bg-gray-300 py-1 ${
                   choice === "photo"
                     ? "bg-gray-200"
@@ -85,7 +102,9 @@ function MenuDialog({setMenu, choice, onClick, photo, video, floor, vr, setEdit,
                 </div>
               }
 
-              {floor && section.id === "floor" &&
+              {floor && section.id === "floor" && (preview === false || (preview === true && selectedFloor && 
+                sections.find(s => s.id === "floor")?.visible === true
+              )) &&
                 <div onClick={()=>onClick("floor")} id="floor" className={`w-34 flex justify-center items-center rounded-lg py-1 hover:bg-gray-200 active:bg-gray-300 ${
                   choice === "floor"
                     ? "bg-gray-200"
@@ -95,7 +114,9 @@ function MenuDialog({setMenu, choice, onClick, photo, video, floor, vr, setEdit,
                 </div>
               }
 
-              {video && section.id === "video" &&
+              {video && section.id === "video" && (preview === false || (preview === true && selectedVideo && 
+                sections.find(s => s.id === "video")?.visible === true
+              )) &&
                 <div onClick={()=>onClick("video")} id="video" className={`w-34 flex justify-center items-center rounded-lg py-1 hover:bg-gray-200 active:bg-gray-300 ${
                   choice === "video"
                     ? "bg-gray-200"
@@ -115,7 +136,9 @@ function MenuDialog({setMenu, choice, onClick, photo, video, floor, vr, setEdit,
                 </div>
               }
 
-              {section.id === "location" &&
+              {section.id === "location" && (preview === false || (preview === true &&
+                sections.find(s => s.id === "location")?.visible === true
+              )) &&
                 <div onClick={()=>onClick("location")} id="location" className={`w-34 flex justify-center items-center rounded-lg py-1 hover:bg-gray-200 active:bg-gray-300 ${
                   choice === "location"
                     ? "bg-gray-200"
@@ -125,7 +148,9 @@ function MenuDialog({setMenu, choice, onClick, photo, video, floor, vr, setEdit,
                 </div>
               }
 
-              {section.id === "contact" &&
+              {section.id === "contact" && (preview === false || (preview === true && selectedAgent && 
+                sections.find(s => s.id === "contact")?.visible === true
+              )) &&
                 <div onClick={()=>onClick("contact")} id="contact" className={`w-34 flex justify-center items-center rounded-lg py-1 hover:bg-gray-200 active:bg-gray-300 ${
                   choice === "contact"
                     ? "bg-gray-200"

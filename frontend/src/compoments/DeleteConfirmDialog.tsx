@@ -26,7 +26,7 @@ function DeleteConfirmDialog({setDele, agent, setAgent, i}:DialogProps){
         <span className="text-lg font-bold">Delete agent information</span>
         <span className="text-gray-500 text-xs mt-2">Are you sure to delete this agent?</span>
 
-        <button onClick={() => confirmHandler(i)} className="border-2 px-8 my-auto py-1.5 rounded-3xl bg-black text-white hover:bg-gray-800 active:bg-gray-700 disabled:bg-gray-400 sm:bg-blue-500 sm:hover:bg-blue-600 sm:active:bg-blue-700">Confirm</button>
+        <button onClick={() => confirmHandler(i)} className="border-2 px-8 my-auto py-1.5 rounded-3xl bg-black text-white hover:bg-gray-800 active:bg-gray-700 sm:bg-blue-500 sm:hover:bg-blue-600 sm:active:bg-blue-700">Confirm</button>
       </div>
     </div>
   )

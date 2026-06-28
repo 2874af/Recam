@@ -11,7 +11,7 @@ import Flower from "../assets/Flower.png";
 import Her from "../assets/Her.png";
 import InforBlock2 from "../compoments/InforBlock2";
 import { BedDouble, Bath, CarFront, Grid2x2Plus } from 'lucide-react';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import map from "../assets/map.png"
 import MenuDialog from "../compoments/MenuDialog";
 import DownloadDialog from "../compoments/DownloadDialog";
@@ -25,9 +25,10 @@ import SelectPhotoDialog from "../compoments/SelectPhotoDialog";
 import SelectFloorDialog from "../compoments/SelectFloorDialog";
 import SelectVideoDialog from "../compoments/SelectVideoDialog";
 import CreateAgentDialog from "../compoments/CreateAgentDialog";
-import CreateAgentDialog2 from "../pages/CreateAgentDialog2";
+import CreateAgentDialog2 from "../compoments/CreateAgentDialog2";
 import { Mail, Phone } from 'lucide-react';
 import EditAgentDialog from "../compoments/EditAgentDialog";
+import ContactAgentDialog from "../compoments/ContactAgentDialog";
 
 export type Section ={
   id: string;
@@ -73,7 +74,6 @@ function ShowPage(){
 
   const navigate = useNavigate();
   const [description, setDescription] = useState("");
-  const [contact, setContact] = useState("");
   const [menu, setMenu] = useState(false);
   const [download, setDownload] = useState(false);
   const [choice, setChoice] = useState("");
@@ -136,6 +136,12 @@ function ShowPage(){
   const [office, setOffice] = useState("");
   const [isSelected, setIsSelected] = useState(false);
   const [aindex, setAindex] = useState(0);
+
+  const [preview, setPreview] = useState(false);
+  const [contact, setContact] = useState(false);
+  const [expand, setExpand] = useState(false);
+  const [isOver, setIsOver] = useState(false);
+  const descriptionRef = useRef<HTMLDivElement | null>(null);
 
 
   const [sections, setSections] = useState<Section[]>([
@@ -204,6 +210,14 @@ function ShowPage(){
     console.log(newSections);
   }
 
+  useEffect(()=>{
+    const element = descriptionRef.current;
+
+    if (element) {
+      setIsOver(element.scrollHeight > element.clientHeight);
+    }
+  }, [description])
+
   
   useEffect(() => {
     const handleScroll = () => {
@@ -251,7 +265,7 @@ function ShowPage(){
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [sections]);
 
   useEffect(()=>{
     const allPhotos = photo.map(p => (
@@ -277,7 +291,7 @@ function ShowPage(){
   return (
     <div className="flex flex-col items-center pb-6">
       {/* <div
-        className="fixed left-0 right-0 h-[2px] bg-red-500 z-[9999]"
+        className="fixed left-0 right-0 h-0.5 bg-red-500 z-9999"
         style={{ top: `${debugLine}vh` }}
       /> */}
       <div className="bg-black h-12 flex items-center px-7 w-full z-50 sticky top-0 sm:hidden">
@@ -287,7 +301,7 @@ function ShowPage(){
           <path d="M5 18H19" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
         
-        {!edit 
+        {(!edit && !preview) 
           ?
           <button onClick={()=>setDownload(true)} className="bg-white text-black flex gap-2 rounded-2xl py-0.5 px-3 items-center ml-auto hover:bg-gray-300 active:bg-gray-500">
             <svg width="19" height="19" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -305,7 +319,10 @@ function ShowPage(){
           </button>
           :
           <div className="flex-1 flex gap-2">
-            <button onClick={()=>setEdit(false)} className="text-white border border-white px-3 text-sm py-0.5 rounded-2xl ml-auto">
+            <button onClick={()=>{
+              setEdit(false);
+              setPreview(false);
+            }} className="text-white border border-white px-3 text-sm py-0.5 rounded-2xl ml-auto">
               Exit
             </button>
 
@@ -339,7 +356,20 @@ function ShowPage(){
         </div>
 
         <div className="flex items-center gap-3">
-          <button onClick={()=>setEdit(true)} className={`border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400 ${edit ? "hidden" : "block"}`}>
+          <button onClick={()=>{
+            setEdit(false);
+            setPreview(false);
+          }} className={`border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400 ${(edit || preview) ? "block" : "hidden"}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
+              <path fillRule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm10.72 4.72a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H9a.75.75 0 0 1 0-1.5h10.94l-1.72-1.72a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+            </svg>
+            <span>Exit</span>
+          </button>
+
+          <button onClick={()=>{
+            setEdit(true);
+            setPreview(false);
+          }} className={`border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400 ${edit ? "hidden" : "block"}`}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
               <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
               <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
@@ -347,14 +377,10 @@ function ShowPage(){
             <span>Edit</span>
           </button>
 
-          <button onClick={()=>setEdit(false)} className={`border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400 ${edit ? "block" : "hidden"}`}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
-              <path fillRule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm10.72 4.72a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H9a.75.75 0 0 1 0-1.5h10.94l-1.72-1.72a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-            </svg>
-            <span>Exit</span>
-          </button>
-
-          <button className="border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400">
+          <button onClick={()=>{
+            setPreview(true);
+            setEdit(false);
+          }} className={`border-2 border-black flex items-center justify-center rounded-3xl py-1.5 gap-1 w-30 text-sm hover:bg-gray-200 active:bg-gray-400 ${preview ? "hidden" : "block"}`}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
               <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
               <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clipRule="evenodd" />
@@ -380,10 +406,10 @@ function ShowPage(){
 
       </div>
 
-      {choice && <TopBar2 choice={choice} onClick={scrollTo} photo={photo.length !== 0} video={video.length !== 0} vr={vr.length !== 0} floor={floor.length !== 0} sections={sections} />}
+      {choice && <TopBar2 description={description !== ""} preview={preview} selectedAgent={selectedAgent.length !== 0} selectedFloor={selectedFloor.length !== 0} selectedPhoto={selectedPhoto.length !== 0} selectedVideo={selectedVideo.length !== 0}  choice={choice} onClick={scrollTo} photo={photo.length !== 0} video={video.length !== 0} vr={vr.length !== 0} floor={floor.length !== 0} sections={sections} />}
 
       <div className="w-full h-70 overflow-hidden relative sm:hidden">
-        {edit && 
+        {edit &&
           <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3">
             <button onClick={()=>setSelectc(true)} className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
@@ -400,7 +426,7 @@ function ShowPage(){
       </div>
 
       <div className="flex flex-col items-center w-full pb-8 border border-gray-100 relative sm:hidden">
-        {edit && 
+        {edit &&
           <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3">
               <button onClick={()=>setDetail(true)} className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
@@ -489,9 +515,11 @@ function ShowPage(){
       
       {sections.map((section, index)=>(
         <div key={index} className="w-full">
-          {section.id === "description" &&
-            <div id="description" className="flex relative flex-col items-center py-6 border-t border-b border-gray-100 w-full sm:mt-0 sm:pt-12 sm:pb-10 sm:gap-3 sm:border-b-7 sm:border-t-7 ">
-              {edit && 
+          {section.id === "description" && (preview === false || (preview === true && description !== "" && 
+            sections.find(s => s.id === "description")?.visible === true
+           )) &&
+            <div id="description" className="flex relative flex-col items-center justify-center px-7 sm:px-50 pt-6 pb-8 border-t border-b border-gray-100 w-full sm:mt-0 sm:pt-12 sm:pb-10 sm:gap-3 sm:border-b-7 sm:border-t-7 ">
+              {edit &&
                 <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3">
                   <div className="flex absolute right-3 top-2 gap-1 sm:top-3 sm:right-6">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`size-6 sm:size-10 ${index === 0 ? "text-black/40" : "text-white hover:text-gray-200 active:text-gray-300 "}`} onClick={()=>moveUp("description")}>
@@ -520,12 +548,32 @@ function ShowPage(){
               }
 
               <span className="font-['Playfair_Display'] font-bold text-xl pb-4 sm:text-3xl">Property Description</span>
-              <span className="text-xs text-gray-500 font-light pb-3 sm:text-sm">{`${description ? {description} : "Please add property description here" }`}</span>
-              <span className="underline text-xs hover:text-gray-400 active:text-gray-500 sm:text-sm">Click to add</span>
+              <div ref={descriptionRef} className={`text-xs text-gray-500 font-light sm:text-sm ${!expand ? "line-clamp-3" : "" }`}>{`${description ? description : "Please add property description here" }`}</div>
+
+              <div className="w-full flex justify-center gap-3">
+                {!preview && <span onClick={()=>setDes(true)} className="underline text-xs pt-3 hover:text-gray-400 active:text-gray-500 sm:text-sm">Click to add</span>}
+
+                {isOver && 
+                  <span onClick={()=>setExpand(prev => !prev)} className="font-bold underline text-xs pt-3 hover:text-gray-400 active:text-gray-500 sm:text-sm">{expand ? "Read less" : "Read more"}</span>
+                }
+              </div>
+
+              {preview && 
+                <button onClick={()=>setContact(true)} className="flex absolute bottom-3 sm:bottom-8 sm:bg-blue-500 sm:hover:bg-blue-600 sm:active:bg-blue-700 sm:right-10 right-4 bg-black items-center gap-1 py-1.5 px-2.5 sm:py-2.5 sm:px-3.5 rounded-lg hover:bg-gray-700 active:bg-gray-600 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:active:bg-gray-400" disabled={selectedAgent.length === 0}>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4 text-white">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
+                  </svg>
+
+                  <span className="text-white text-xs">Contact</span>
+                </button>
+              }
+
             </div>
           }
 
-          {photo.length > 0 && section.id === "photo" && 
+          {photo.length > 0 && section.id === "photo" && (preview === false || (preview === true && selectedPhoto.length !== 0 && 
+            sections.find(s => s.id === "photo")?.visible === true
+          ) ) &&
             <div id="photo" className="flex flex-col items-center py-6 w-full relative sm:py-11">
               {edit && 
                 <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3 z-30">
@@ -999,9 +1047,11 @@ function ShowPage(){
             </div>
           }
 
-          {floor.length > 0 && section.id === "floor" &&
+          {floor.length > 0 && section.id === "floor" && (preview === false || (preview === true && selectedFloor.length !== 0 && 
+            sections.find(s => s.id === "floor")?.visible === true
+          ) ) &&
             <div id="floor" className="flex flex-col items-center py-6 border-t relative border-b border-gray-100 w-full px-2 sm:border-b-7 sm:border-t-7 lg:px-60 sm:pb-12">
-              {edit && 
+              {edit &&
                 <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3 z-30">
                   <div className="flex absolute right-3 top-2 gap-1 sm:top-3 sm:right-6">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`size-6 sm:size-10 ${index === 0 ? "text-black/40" : "text-white hover:text-gray-200 active:text-gray-300 "}`} onClick={()=>moveUp("floor")}>
@@ -1116,7 +1166,9 @@ function ShowPage(){
             </div>
           }
 
-          {video.length > 0 && section.id === "video" &&
+          {video.length > 0 && section.id === "video" && (preview === false || (preview === true && selectedVideo.length !== 0 && 
+            sections.find(s => s.id === "video")?.visible === true
+          ) ) &&
             <div id="video" className="flex flex-col items-center py-6 relative border-b border-gray-100 w-full px-2 lg:px-60 sm:pb-13 sm:border-b-7">
               {edit && 
                 <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3 z-30">
@@ -1244,7 +1296,9 @@ function ShowPage(){
             </div>
           }
 
-          {section.id === "location" && 
+          {section.id === "location" && (preview === false || (preview === true && 
+            sections.find(s => s.id === "location")?.visible === true
+          )) &&
             <div id="location" className="flex flex-col items-center py-6 relative border-b border-gray-100 w-full px-2 lg:px-60 sm:pb-12 sm:border-b-7">
               {edit && 
                 <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3">
@@ -1272,7 +1326,9 @@ function ShowPage(){
             </div>
           }
 
-          {section.id === "contact" && 
+          {section.id === "contact" && (preview === false || (preview === true && selectedAgent.length !== 0 && 
+            sections.find(s => s.id === "contact")?.visible === true
+          ) ) &&
             <div id="contact" className="flex flex-col relative items-center py-6 border-b border-gray-100 w-full sm:border-b-7 sm:pb-12 sm:pt-10 sm:gap-3">
               {edit && 
                 <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center gap-3">
@@ -1290,7 +1346,9 @@ function ShowPage(){
                       <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <button onClick={()=>setAopen(true)} className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
+                  <button onClick={()=>{
+                    setAopen(true);
+                  }} className="flex bg-white px-4 py-1 rounded-lg gap-1 font-medium items-center hover:bg-gray-200 active:bg-gray-300">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                       <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
                       <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
@@ -1302,9 +1360,9 @@ function ShowPage(){
                 </div>
               }
               <span className="font-['Playfair_Display'] font-bold text-xl pb-4 sm:text-3xl">Contact</span>
-              {agent.length === 0
+              {selectedAgent.length === 0
                 ?
-                  <span className="text-xs text-gray-500 font-light pb-3 sm:text-sm">{`${contact ? {contact} : "Please add agent contact information" }`}</span>
+                  <span className="text-xs text-gray-500 font-light pb-3 sm:text-sm">Please add agent contact information</span>
                 :
                   <div className="flex flex-col w-full px-4 gap-3 sm:grid sm:grid-cols-3 sm:gap-7 sm:px-15">
                     {selectedAgent.map((a, index) => (
@@ -1333,20 +1391,22 @@ function ShowPage(){
                     ))}
                   </div>
               }
-              <span className="underline mt-3 text-xs hover:text-gray-400 active:text-gray-500 sm:text-sm">Click to add</span>
+              {!preview && 
+                <span onClick={()=>setAopen(true)} className="underline mt-3 text-xs hover:text-gray-400 active:text-gray-500 sm:text-sm">Click to add</span>
+              }
             </div>
           }
         </div>
       ))}
       
 
-      {menu && <MenuDialog setEdit={setEdit} setMenu={setMenu} choice={choice} onClick={scrollTo} photo={photo.length !== 0} video={video.length !== 0} vr={vr.length !== 0} floor={floor.length !== 0} sections={sections} edit={edit} />}
+      {menu && <MenuDialog description={description !== ""} selectedAgent={selectedAgent.length !== 0} selectedFloor={selectedFloor.length !== 0} selectedPhoto={selectedPhoto.length !== 0} selectedVideo={selectedVideo.length !== 0} setEdit={setEdit} setMenu={setMenu} choice={choice} onClick={scrollTo} photo={photo.length !== 0} video={video.length !== 0} vr={vr.length !== 0} floor={floor.length !== 0} sections={sections} edit={edit} preview={preview} setPreview={setPreview} />}
       {download && <DownloadDialog setDownload={setDownload} pnum={pnum} wnum={wnum} fnum={fnum} vnum={vnum} />}
-      {popen && <PhotoDisplayDialog list={photo} setOpen={setPopen} page={ppage} setPage={setPpage} />}
+      {popen && <PhotoDisplayDialog list={selectedPhoto} setOpen={setPopen} page={ppage} setPage={setPpage} />}
       {fopen && <PhotoDisplayDialog list={floor} setOpen={setFopen} page={fpage} setPage={setFpage} />}
       {vopen && <PhotoDisplayDialog list={video} setOpen={setVopen} page={vpage} setPage={setVpage} />}
       {detail && <PropertyDetailDialog2 pstatus={pstatus} type={type} bed={bed} car={car} area={area} bath={bath} setDetail={setDetail} setPstatus={setPstatus} setType={setType} setBed={setBed} setArea={setArea} setBath={setBath} setCar={setCar} address={address} setAddress={setAddress} location={location} setLocation={setLocation} city={city} setCity={setCity} zone={zone} setZone={setZone} post={post} setPost={setPost} />}
-      {des && <DescriptionDialog setDes={setDes} description={description} setDescription={setDescription} />}
+      {des && <DescriptionDialog description={description} setDes={setDes} setDescription={setDescription} />}
       {selectc && <SelectCoverDialog setSelectc={setSelectc} setCover={setCover} photo={photo} video={video} cover={cover} />}
       {selectp && <SelectPhotoDialog setSelectp={setSelectp} ophoto={ophoto} setOphoto={setOphoto} setSelectedPhoto={setSelectedPhoto} />}
       {selectf && <SelectFloorDialog setSelectf={setSelectf} ofloor={ofloor} setOfloor={setOfloor} setSelectedFloor={setSelectedFloor} />}
@@ -1354,6 +1414,7 @@ function ShowPage(){
       {aopen && <CreateAgentDialog setOpen={setAopen} agent={agent} setAgent={setAgent} setCreateAgent={setCreateAgent} setSelectedAgent={setSelectedAgent} setEditAgent={setEditAgent} setEmail={setEmail} setFirstname={setFirstname} setLastname={setLastname} setMedia={setMedia} setOffice={setOffice} setPhone={setPhone} setIsSelected={setIsSelected} setAindex={setAindex} />}
       {createAgent && <CreateAgentDialog2 setCreateAgent={setCreateAgent} setAopen={setAopen} agent={agent} setAgent={setAgent} />}
       {editAgent && <EditAgentDialog setAopen={setAopen} setEditAgent={setEditAgent} agent={agent} setAgent={setAgent} initialMedia={media} initialEmail={email} initialFirstname={firstname} initialLastname={lastname} initialOffice={office} initialPhone={phone} index={aindex} initialIsSelected={isSelected} />}
+      {contact && <ContactAgentDialog setContact={setContact} selectedAgent={selectedAgent}/>}
     </div>
   )
 }

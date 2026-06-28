@@ -31,13 +31,13 @@ function CreateAgentDialog({setOpen, agent, setAgent, setCreateAgent, setSelecte
     setAgent(newList);
   }
 
-  const checkValid = () => {
-    if (agent.every(a => a.isSelected === false)){
-      return true;
-    }
+  // const checkValid = () => {
+  //   if (agent.every(a => a.isSelected === false)){
+  //     return true;
+  //   }
 
-    return false;
-  }
+  //   return false;
+  // }
 
   const saveHandler = () => {
     const selectedList = agent.filter(a => a.isSelected === true);
@@ -126,7 +126,7 @@ function CreateAgentDialog({setOpen, agent, setAgent, setCreateAgent, setSelecte
           <button onClick={()=>{
             setOpen(false);
             saveHandler();
-          }} disabled={checkValid()} className="border-2 px-8 ml-auto py-1.5 rounded-3xl bg-black text-white hover:bg-gray-800 active:bg-gray-700 disabled:bg-gray-400 sm:bg-blue-500 sm:hover:bg-blue-600 sm:active:bg-blue-700">
+          }} className="border-2 px-8 ml-auto py-1.5 rounded-3xl bg-black text-white hover:bg-gray-800 active:bg-gray-700 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:active:bg-gray-400 sm:bg-blue-500 sm:hover:bg-blue-600 sm:active:bg-blue-700">
             <span>Save</span>
           </button>
         </div>

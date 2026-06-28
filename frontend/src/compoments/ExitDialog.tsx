@@ -19,7 +19,7 @@ function ExitDialog({onClick, onClose}:ExitDialogProps){
         <div className="flex gap-8">
           <button 
             onClick= {onClick}
-            className={`px-4 py-2 border border-blue-600 text-blue-600 rounded-xl hover:bg-blue-200 active:bg-blue-400 transition-colors disabled:bg-gray-400 w-40 h-12`}
+            className={`px-4 py-2 border border-blue-600 text-blue-600 rounded-xl hover:bg-blue-200 active:bg-blue-400 transition-colors disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:active:bg-gray-400 w-40 h-12`}
           >
             Still Exit
           </button>

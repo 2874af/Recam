@@ -124,7 +124,7 @@ function EditAgentDialog({setAgent, setEditAgent, agent, setAopen, initialEmail,
         <div className="border-t border-gray-300 h-1 my-4"></div>
 
         <div className="flex">
-          <button onClick={()=>saveHandler()} disabled={checkValid()} className="border-2 px-8 ml-auto py-1.5 rounded-3xl bg-black text-white hover:bg-gray-800 active:bg-gray-700 disabled:bg-gray-400 sm:bg-blue-500 sm:hover:bg-blue-600 sm:active:bg-blue-700">Save</button>
+          <button onClick={()=>saveHandler()} disabled={checkValid()} className="border-2 px-8 ml-auto py-1.5 rounded-3xl bg-black text-white hover:bg-gray-800 active:bg-gray-700 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:active:bg-gray-400 sm:bg-blue-500 sm:hover:bg-blue-600 sm:active:bg-blue-700">Save</button>
         </div>
 
       </div>
