@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# .NET generated files
+**/bin/
+**/obj/
+
+# Frontend dependencies and build output
+**/node_modules/
+**/dist/
+
+# Local environment variables
+.env
+.env.*
+!.env.example
+
+# Local backend configuration
+appsettings.Local.json
