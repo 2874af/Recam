@@ -1,9 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Recam.Api.Data;
+using Recam.Api.Interfaces;
+using Recam.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddControllers();
+
+builder.Services.AddScoped<IListingCaseService, ListingCaseService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -16,10 +23,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 var app = builder.Build();
+app.MapControllers();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 
@@ -34,3 +43,7 @@ app.MapGet("/api/health", () =>
 .WithName("GetHealth");
 
 app.Run();
+
+public partial class Program
+{
+}
