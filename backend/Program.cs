@@ -29,6 +29,40 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    await using var scope = app.Services.CreateAsyncScope();
+
+    var dbContext =
+        scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    var loggerFactory =
+        scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
+
+    var logger = loggerFactory.CreateLogger("DatabaseStartup");
+
+    try
+    {
+        logger.LogInformation(
+            "Applying database migrations and development seed data.");
+
+        await dbContext.Database.MigrateAsync();
+
+        await DatabaseSeeder.SeedAsync(
+            dbContext,
+            builder.Configuration,
+            logger);
+
+        logger.LogInformation(
+            "Database migrations and development seed data completed.");
+    }
+    catch (Exception exception)
+    {
+        logger.LogCritical(
+            exception,
+            "Database startup failed. Check the connection string and PostgreSQL availability.");
+
+        throw;
+    }
 }
 
 
