@@ -13,24 +13,25 @@ public static class DatabaseSeeder
     private static readonly Guid DemoAdminId =
         Guid.Parse("22222222-2222-2222-2222-222222222222");
 
+    private static readonly Guid DemoStaffId =
+        Guid.Parse("33333333-3333-3333-3333-333333333333");
+
+    private static readonly Guid DemoAgentId =
+        Guid.Parse("44444444-4444-4444-4444-444444444444");
+
+    private static readonly Guid DemoCompanyAgentId =
+        Guid.Parse("55555555-5555-5555-5555-555555555555");
+
     public static async Task SeedAsync(
         AppDbContext dbContext,
         IConfiguration configuration,
         ILogger logger)
     {
-        const string adminEmail = "admin@recam.local";
-
-        var adminAlreadyExists = await dbContext.Users
-            .AnyAsync(user => user.NormalizedEmail == adminEmail.ToUpperInvariant());
-
-        if (adminAlreadyExists)
-        {
-            logger.LogInformation("Development seed data already exists.");
-            return;
-        }
-
-        var company = await dbContext.PhotographyCompanies
-            .FirstOrDefaultAsync(company => company.Id == DemoCompanyId);
+        var company =
+            await dbContext.PhotographyCompanies
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(
+                    company => company.Id == DemoCompanyId);
 
         if (company is null)
         {
@@ -42,39 +43,137 @@ public static class DatabaseSeeder
 
             dbContext.PhotographyCompanies.Add(company);
         }
-
-        var adminPassword =
-            configuration["Seed:AdminPassword"]
-            ?? throw new InvalidOperationException(
-                "Seed:AdminPassword is not configured.");
-
-        var admin = new AppUser
+        else
         {
-            Id = DemoAdminId,
-            UserName = adminEmail,
-            NormalizedUserName = adminEmail.ToUpperInvariant(),
-            Email = adminEmail,
-            NormalizedEmail = adminEmail.ToUpperInvariant(),
+            company.DeletedAt = null;
+        }
+
+        var admin = await EnsureUserAsync(
+            dbContext,
+            configuration,
+            DemoAdminId,
+            "admin@recam.local",
+            "Recam Demo Admin",
+            UserRole.Admin,
+            company,
+            "Seed:AdminPassword");
+
+        var staff = await EnsureUserAsync(
+            dbContext,
+            configuration,
+            DemoStaffId,
+            "staff@recam.local",
+            "Recam Demo Staff",
+            UserRole.Staff,
+            company,
+            "Seed:StaffPassword");
+
+        var agent = await EnsureUserAsync(
+            dbContext,
+            configuration,
+            DemoAgentId,
+            "agent@recam.local",
+            "Recam Demo Agent",
+            UserRole.Agent,
+            null,
+            "Seed:AgentPassword");
+
+        await dbContext.SaveChangesAsync();
+
+        var companyAgent =
+            await dbContext.CompanyAgents
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(
+                    relationship =>
+                        relationship.PhotographyCompanyId ==
+                            company.Id &&
+                        relationship.AgentUserId ==
+                            agent.Id);
+
+        if (companyAgent is null)
+        {
+            companyAgent = new CompanyAgent
+            {
+                Id = DemoCompanyAgentId,
+                PhotographyCompanyId = company.Id,
+                PhotographyCompany = company,
+                AgentUserId = agent.Id,
+                AgentUser = agent
+            };
+
+            dbContext.CompanyAgents.Add(companyAgent);
+        }
+        else
+        {
+            companyAgent.DeletedAt = null;
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        logger.LogInformation(
+            "Development seed data is ready for Admin {AdminEmail}, Staff {StaffEmail}, and Agent {AgentEmail}.",
+            admin.Email,
+            staff.Email,
+            agent.Email);
+    }
+
+    private static async Task<AppUser> EnsureUserAsync(
+        AppDbContext dbContext,
+        IConfiguration configuration,
+        Guid id,
+        string email,
+        string displayName,
+        UserRole role,
+        PhotographyCompany? company,
+        string passwordConfigurationKey)
+    {
+        var normalizedEmail =
+            email.ToUpperInvariant();
+
+        var existingUser =
+            await dbContext.Users
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(
+                    user =>
+                        user.NormalizedEmail ==
+                            normalizedEmail);
+
+        if (existingUser is not null)
+        {
+            return existingUser;
+        }
+
+        var password =
+            configuration[passwordConfigurationKey]
+            ?? throw new InvalidOperationException(
+                $"{passwordConfigurationKey} is not configured.");
+
+        var user = new AppUser
+        {
+            Id = id,
+            UserName = email,
+            NormalizedUserName = normalizedEmail,
+            Email = email,
+            NormalizedEmail = normalizedEmail,
             EmailConfirmed = true,
-            DisplayName = "Recam Demo Admin",
-            Role = UserRole.Admin,
-            PhotographyCompanyId = company.Id,
+            DisplayName = displayName,
+            Role = role,
+            PhotographyCompanyId = company?.Id,
             PhotographyCompany = company,
             SecurityStamp = Guid.NewGuid().ToString(),
             ConcurrencyStamp = Guid.NewGuid().ToString()
         };
 
-        var passwordHasher = new PasswordHasher<AppUser>();
+        var passwordHasher =
+            new PasswordHasher<AppUser>();
 
-        admin.PasswordHash = passwordHasher.HashPassword(
-            admin,
-            adminPassword);
+        user.PasswordHash =
+            passwordHasher.HashPassword(
+                user,
+                password);
 
-        dbContext.Users.Add(admin);
-        await dbContext.SaveChangesAsync();
+        dbContext.Users.Add(user);
 
-        logger.LogInformation(
-            "Created development company and Admin account {AdminEmail}.",
-            adminEmail);
+        return user;
     }
 }

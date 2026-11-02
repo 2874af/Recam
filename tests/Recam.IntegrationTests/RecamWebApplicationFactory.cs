@@ -31,7 +31,10 @@ public sealed class RecamWebApplicationFactory
                         ["Jwt:Key"] =
                             "integration-test-key-that-is-long-enough-for-hmac-sha256-123456789",
                         ["Jwt:AccessTokenMinutes"] = "15",
-                        ["Jwt:RefreshTokenDays"] = "7"
+                        ["Jwt:RefreshTokenDays"] = "7",
+                        ["Seed:AdminPassword"] = "TestAdmin123!",
+                        ["Seed:StaffPassword"] = "TestStaff123!",
+                        ["Seed:AgentPassword"] = "TestAgent123!",
                     });
             });
 
