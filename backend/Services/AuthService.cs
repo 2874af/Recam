@@ -19,18 +19,23 @@ public class AuthService : IAuthService
     private readonly JwtOptions _jwtOptions;
     private readonly ICurrentUserContext _currentUser;
 
+    private readonly IPasswordResetEmailSender _passwordResetEmailSender;
+    
+
     public AuthService(
         UserManager<AppUser> userManager,
         AppDbContext dbContext,
         ITokenService tokenService,
         IOptions<JwtOptions> jwtOptions,
-        ICurrentUserContext currentUser)
+        ICurrentUserContext currentUser,
+        IPasswordResetEmailSender passwordResetEmailSender)
     {
         _userManager = userManager;
         _dbContext = dbContext;
         _tokenService = tokenService;
         _jwtOptions = jwtOptions.Value;
         _currentUser = currentUser;
+        _passwordResetEmailSender = passwordResetEmailSender;
     }
 
     public async Task<AuthResult> RegisterAgentAsync(
@@ -321,5 +326,87 @@ public class AuthService : IAuthService
                     user.PhotographyCompanyId
             }
         };
+    }
+
+    public async Task ForgotPasswordAsync(
+        ForgotPasswordRequestDTO request,
+        CancellationToken cancellationToken = default)
+    {
+        var email = request.Email
+            .Trim()
+            .ToLowerInvariant();
+
+        var user =
+            await _userManager.FindByEmailAsync(email);
+
+        if (user is null)
+        {
+            return;
+        }
+
+        var resetToken =
+            await _userManager
+                .GeneratePasswordResetTokenAsync(user);
+
+        await _passwordResetEmailSender
+            .SendPasswordResetAsync(
+                user.Email!,
+                user.DisplayName,
+                resetToken,
+                cancellationToken);
+    }
+
+    public async Task<OperationResult> ResetPasswordAsync(
+        ResetPasswordRequestDTO request,
+        CancellationToken cancellationToken = default)
+    {
+        var email = request.Email
+            .Trim()
+            .ToLowerInvariant();
+
+        var user =
+            await _userManager.FindByEmailAsync(email);
+
+        if (user is null)
+        {
+            return OperationResult.Failure(
+                "Invalid password reset request.");
+        }
+
+        var resetToken =
+            Uri.UnescapeDataString(request.Token);
+
+        var result =
+            await _userManager.ResetPasswordAsync(
+                user,
+                resetToken,
+                request.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            return OperationResult.Failure(
+                result.Errors
+                    .Select(error => error.Description)
+                    .ToArray());
+        }
+
+        var refreshTokens =
+            await _dbContext.RefreshTokens
+                .Where(token =>
+                    token.UserId == user.Id &&
+                    token.RevokedAt == null)
+                .ToListAsync(cancellationToken);
+
+        var revokedAt = DateTimeOffset.UtcNow;
+
+        foreach (var token in refreshTokens)
+        {
+            token.RevokedAt = revokedAt;
+        }
+
+        await _dbContext.SaveChangesAsync(
+            cancellationToken);
+
+        return OperationResult.Success();
     }
 }

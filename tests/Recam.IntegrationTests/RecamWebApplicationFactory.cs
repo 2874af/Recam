@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Recam.Api.Data;
+using Recam.Api.Interfaces;
 
 namespace Recam.IntegrationTests;
 
@@ -35,6 +36,9 @@ public sealed class RecamWebApplicationFactory
                         ["Seed:AdminPassword"] = "TestAdmin123!",
                         ["Seed:StaffPassword"] = "TestStaff123!",
                         ["Seed:AgentPassword"] = "TestAgent123!",
+                        ["PasswordReset:ResetUrl"] =
+                            "http://localhost/reset-password",
+                        ["PasswordReset:TokenLifespanMinutes"] = "30",
                     });
             });
 
@@ -45,8 +49,20 @@ public sealed class RecamWebApplicationFactory
 
             services.RemoveAll<
                 IDbContextOptionsConfiguration<AppDbContext>>();
+            
+            services.RemoveAll<
+                IPasswordResetEmailSender>();
 
-            services.RemoveAll<AppDbContext>();
+            services.AddSingleton<
+                TestPasswordResetEmailSender>();
+
+            services.AddSingleton<
+                IPasswordResetEmailSender>(
+                serviceProvider =>
+                    serviceProvider.GetRequiredService<
+                        TestPasswordResetEmailSender>());
+
+                        services.RemoveAll<AppDbContext>();
 
             _connection = new SqliteConnection(
                 "Data Source=:memory:");

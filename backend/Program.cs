@@ -63,7 +63,8 @@ builder.Services
         options.Password.RequireNonAlphanumeric = true;
     })
     .AddSignInManager()
-    .AddEntityFrameworkStores<AppDbContext>();
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 var jwtSection =
     builder.Configuration.GetSection(JwtOptions.SectionName);
@@ -120,6 +121,46 @@ builder.Services
             };
     });
 
+builder.Services
+    .AddOptions<EmailOptions>()
+    .Bind(
+        builder.Configuration.GetSection(
+            EmailOptions.SectionName));
+
+builder.Services
+    .AddOptions<PasswordResetOptions>()
+    .Bind(
+        builder.Configuration.GetSection(
+            PasswordResetOptions.SectionName))
+    .Validate(
+        options =>
+            !string.IsNullOrWhiteSpace(
+                options.ResetUrl),
+        "PasswordReset:ResetUrl is required.")
+    .Validate(
+        options =>
+            options.TokenLifespanMinutes > 0,
+        "PasswordReset:TokenLifespanMinutes must be greater than zero.")
+    .ValidateOnStart();
+
+builder.Services.Configure<
+    DataProtectionTokenProviderOptions>(
+    options =>
+    {
+        var passwordResetOptions =
+            builder.Configuration
+                .GetSection(
+                    PasswordResetOptions.SectionName)
+                .Get<PasswordResetOptions>()
+            ?? throw new InvalidOperationException(
+                "Password reset configuration is missing.");
+
+        options.TokenLifespan =
+            TimeSpan.FromMinutes(
+                passwordResetOptions
+                    .TokenLifespanMinutes);
+    });
+
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddAuthorization(options =>
@@ -166,6 +207,49 @@ builder.Services.AddAuthorization(options =>
                     RecamClaimTypes.CompanyId);
             });
     });
+
+var emailProvider =
+    builder.Configuration[
+        "Email:Provider"]
+    ?? "Development";
+
+if (emailProvider.Equals(
+    "Development",
+    StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddScoped<
+        IPasswordResetEmailSender,
+        DevelopmentPasswordResetEmailSender>();
+}
+else if (emailProvider.Equals(
+    "Resend",
+    StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddHttpClient<
+        ResendPasswordResetEmailSender>(
+        (serviceProvider, httpClient) =>
+        {
+            var emailOptions =
+                serviceProvider
+                    .GetRequiredService<
+                        IOptions<EmailOptions>>()
+                    .Value;
+
+            httpClient.BaseAddress =
+                new Uri(emailOptions.ApiUrl);
+        });
+
+    builder.Services.AddScoped<
+        IPasswordResetEmailSender>(
+        serviceProvider =>
+            serviceProvider.GetRequiredService<
+                ResendPasswordResetEmailSender>());
+}
+else
+{
+    throw new InvalidOperationException(
+        $"Unsupported email provider: {emailProvider}");
+}
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 

@@ -161,4 +161,47 @@ public class AuthController : ControllerBase
 
         return NoContent();
     }
+
+    [AllowAnonymous]
+    [HttpPost("forgot-password")]
+    [ProducesResponseType(
+        StatusCodes.Status202Accepted)]
+    [ProducesResponseType(
+        StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ForgotPassword(
+        ForgotPasswordRequestDTO request,
+        CancellationToken cancellationToken)
+    {
+        await _authService.ForgotPasswordAsync(
+            request,
+            cancellationToken);
+
+        return Accepted();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("reset-password")]
+    [ProducesResponseType(
+        StatusCodes.Status204NoContent)]
+    [ProducesResponseType(
+        StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ResetPassword(
+        ResetPasswordRequestDTO request,
+        CancellationToken cancellationToken)
+    {
+        var result =
+            await _authService.ResetPasswordAsync(
+                request,
+                cancellationToken);
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(new
+            {
+                errors = result.Errors
+            });
+        }
+
+        return NoContent();
+    }
 }
