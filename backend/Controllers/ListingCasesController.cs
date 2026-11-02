@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Recam.Api.DTOs;
 using Recam.Api.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Recam.Api.Authorization;
 
 namespace Recam.Api.Controllers;
 
 [ApiController]
 [Route("api/listing-cases")]
+[Authorize(
+    Policy = AuthorizationPolicies.CompanyMember)]
 public sealed class ListingCasesController : ControllerBase
 {
     private readonly IListingCaseService _listingCaseService;
