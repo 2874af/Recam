@@ -17,6 +17,9 @@ public interface IAuthService
         RefreshTokenRequestDTO request,
         CancellationToken cancellationToken = default);
     
+    Task<AuthUserResponseDTO?> GetCurrentUserAsync(
+        CancellationToken cancellationToken = default);
+    
     Task LogoutAsync(
         RefreshTokenRequestDTO request,
         CancellationToken cancellationToken = default);

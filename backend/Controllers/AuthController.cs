@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Recam.Api.DTOs.Auth;
 using Recam.Api.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Recam.Api.Controllers;
 
@@ -109,5 +110,27 @@ public class AuthController : ControllerBase
             cancellationToken);
 
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    [ProducesResponseType(
+        typeof(AuthUserResponseDTO),
+        StatusCodes.Status200OK)]
+    [ProducesResponseType(
+        StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetCurrentUser(
+        CancellationToken cancellationToken)
+    {
+        var user =
+            await _authService.GetCurrentUserAsync(
+                cancellationToken);
+
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(user);
     }
 }

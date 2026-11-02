@@ -17,17 +17,20 @@ public class AuthService : IAuthService
     private readonly AppDbContext _dbContext;
     private readonly ITokenService _tokenService;
     private readonly JwtOptions _jwtOptions;
+    private readonly ICurrentUserContext _currentUser;
 
     public AuthService(
         UserManager<AppUser> userManager,
         AppDbContext dbContext,
         ITokenService tokenService,
-        IOptions<JwtOptions> jwtOptions)
+        IOptions<JwtOptions> jwtOptions,
+        ICurrentUserContext currentUser)
     {
         _userManager = userManager;
         _dbContext = dbContext;
         _tokenService = tokenService;
         _jwtOptions = jwtOptions.Value;
+        _currentUser = currentUser;
     }
 
     public async Task<AuthResult> RegisterAgentAsync(
@@ -87,6 +90,37 @@ public class AuthService : IAuthService
             cancellationToken);
 
         return AuthResult.Success(response);
+    }
+
+    public async Task<AuthUserResponseDTO?>
+        GetCurrentUserAsync(
+            CancellationToken cancellationToken = default)
+    {
+        if (_currentUser.UserId is not Guid userId)
+        {
+            return null;
+        }
+
+        var user = await _dbContext.Users
+            .AsNoTracking()
+            .SingleOrDefaultAsync(
+                user => user.Id == userId,
+                cancellationToken);
+
+        if (user is null)
+        {
+            return null;
+        }
+
+        return new AuthUserResponseDTO
+        {
+            Id = user.Id,
+            DisplayName = user.DisplayName,
+            Email = user.Email!,
+            Role = user.Role,
+            PhotographyCompanyId =
+                user.PhotographyCompanyId
+        };
     }
 
     public async Task<AuthResult> LoginAsync(
