@@ -133,4 +133,32 @@ public class AuthController : ControllerBase
 
         return Ok(user);
     }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    [ProducesResponseType(
+        StatusCodes.Status204NoContent)]
+    [ProducesResponseType(
+        StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(
+        StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ChangePassword(
+        ChangePasswordRequestDTO request,
+        CancellationToken cancellationToken)
+    {
+        var result =
+            await _authService.ChangePasswordAsync(
+                request,
+                cancellationToken);
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(new
+            {
+                errors = result.Errors
+            });
+        }
+
+        return NoContent();
+    }
 }

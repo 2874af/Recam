@@ -200,6 +200,138 @@ public sealed class AuthEndpointTests
             currentUser.PhotographyCompanyId);
     }
 
+    [Fact]
+    public async Task ChangePassword_WithoutToken_ReturnsUnauthorized()
+    {
+        var response =
+            await _client.PostAsJsonAsync(
+                "/api/auth/change-password",
+                new ChangePasswordRequestDTO
+                {
+                    CurrentPassword = "OldPassword123!",
+                    NewPassword = "NewPassword123!"
+                });
+
+        Assert.Equal(
+            HttpStatusCode.Unauthorized,
+            response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ChangePassword_WithWrongCurrentPassword_ReturnsBadRequest()
+    {
+        var registerRequest = CreateRegisterRequest();
+
+        var registerResponse =
+            await _client.PostAsJsonAsync(
+                "/api/auth/register",
+                registerRequest);
+
+        var registered =
+            await registerResponse.Content
+                .ReadFromJsonAsync<AuthResponseDTO>();
+
+        Assert.NotNull(registered);
+
+        _client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue(
+                "Bearer",
+                registered.AccessToken);
+
+        var response =
+            await _client.PostAsJsonAsync(
+                "/api/auth/change-password",
+                new ChangePasswordRequestDTO
+                {
+                    CurrentPassword = "WrongPassword123!",
+                    NewPassword = "ChangedAgent123!"
+                });
+
+        Assert.Equal(
+            HttpStatusCode.BadRequest,
+            response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ChangePassword_WithValidCurrentPassword_ChangesPassword()
+    {
+        var registerRequest = CreateRegisterRequest();
+
+        var registerResponse =
+            await _client.PostAsJsonAsync(
+                "/api/auth/register",
+                registerRequest);
+
+        var registered =
+            await registerResponse.Content
+                .ReadFromJsonAsync<AuthResponseDTO>();
+
+        Assert.NotNull(registered);
+
+        _client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers
+                .AuthenticationHeaderValue(
+                    "Bearer",
+                    registered.AccessToken);
+
+        const string newPassword = "ChangedAgent123!";
+
+        var changeResponse =
+            await _client.PostAsJsonAsync(
+                "/api/auth/change-password",
+                new ChangePasswordRequestDTO
+                {
+                    CurrentPassword =
+                        registerRequest.Password,
+                    NewPassword = newPassword
+                });
+
+        Assert.Equal(
+            HttpStatusCode.NoContent,
+            changeResponse.StatusCode);
+
+        _client.DefaultRequestHeaders.Authorization = null;
+
+        var oldPasswordLogin =
+            await _client.PostAsJsonAsync(
+                "/api/auth/login",
+                new LoginRequestDTO
+                {
+                    Email = registerRequest.Email,
+                    Password = registerRequest.Password
+                });
+
+        Assert.Equal(
+            HttpStatusCode.Unauthorized,
+            oldPasswordLogin.StatusCode);
+
+        var newPasswordLogin =
+            await _client.PostAsJsonAsync(
+                "/api/auth/login",
+                new LoginRequestDTO
+                {
+                    Email = registerRequest.Email,
+                    Password = newPassword
+                });
+
+        Assert.Equal(
+            HttpStatusCode.OK,
+            newPasswordLogin.StatusCode);
+
+        var oldRefreshTokenResponse =
+            await _client.PostAsJsonAsync(
+                "/api/auth/refresh",
+                new RefreshTokenRequestDTO
+                {
+                    RefreshToken =
+                        registered.RefreshToken
+                });
+
+        Assert.Equal(
+            HttpStatusCode.Unauthorized,
+            oldRefreshTokenResponse.StatusCode);
+    }
+
     private static RegisterRequestDTO
         CreateRegisterRequest()
     {
