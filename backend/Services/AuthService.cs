@@ -123,6 +123,58 @@ public class AuthService : IAuthService
         };
     }
 
+    public async Task<OperationResult> ChangePasswordAsync(
+        ChangePasswordRequestDTO request,
+        CancellationToken cancellationToken = default)
+    {
+        if (_currentUser.UserId is not Guid userId)
+        {
+            return OperationResult.Failure(
+                "The current user could not be identified.");
+        }
+
+        var user = await _userManager.FindByIdAsync(
+            userId.ToString());
+
+        if (user is null)
+        {
+            return OperationResult.Failure(
+                "The current user could not be found.");
+        }
+
+        var result = await _userManager.ChangePasswordAsync(
+            user,
+            request.CurrentPassword,
+            request.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            return OperationResult.Failure(
+                result.Errors
+                    .Select(error => error.Description)
+                    .ToArray());
+        }
+
+        var activeRefreshTokens =
+            await _dbContext.RefreshTokens
+                .Where(token =>
+                    token.UserId == userId &&
+                    token.RevokedAt == null)
+                .ToListAsync(cancellationToken);
+
+        var revokedAt = DateTimeOffset.UtcNow;
+
+        foreach (var token in activeRefreshTokens)
+        {
+            token.RevokedAt = revokedAt;
+        }
+
+        await _dbContext.SaveChangesAsync(
+            cancellationToken);
+
+        return OperationResult.Success();
+    }
+
     public async Task<AuthResult> LoginAsync(
         LoginRequestDTO request,
         CancellationToken cancellationToken = default)
