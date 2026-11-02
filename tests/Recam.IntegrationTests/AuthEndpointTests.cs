@@ -142,6 +142,64 @@ public sealed class AuthEndpointTests
             refreshAfterLogoutResponse.StatusCode);
     }
 
+    [Fact]
+    public async Task GetCurrentUser_WithoutToken_ReturnsUnauthorized()
+    {
+        var response = await _client.GetAsync(
+            "/api/auth/me");
+
+        Assert.Equal(
+            HttpStatusCode.Unauthorized,
+            response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetCurrentUser_WithToken_ReturnsCurrentUser()
+    {
+        var registerRequest = CreateRegisterRequest();
+
+        var registerResponse =
+            await _client.PostAsJsonAsync(
+                "/api/auth/register",
+                registerRequest);
+
+        var registered =
+            await registerResponse.Content
+                .ReadFromJsonAsync<AuthResponseDTO>();
+
+        Assert.NotNull(registered);
+
+        _client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers
+                .AuthenticationHeaderValue(
+                    "Bearer",
+                    registered.AccessToken);
+
+        var response = await _client.GetAsync(
+            "/api/auth/me");
+
+        Assert.Equal(
+            HttpStatusCode.OK,
+            response.StatusCode);
+
+        var currentUser =
+            await response.Content
+                .ReadFromJsonAsync<AuthUserResponseDTO>();
+
+        Assert.NotNull(currentUser);
+        Assert.Equal(
+            registered.User.Id,
+            currentUser.Id);
+        Assert.Equal(
+            registerRequest.Email,
+            currentUser.Email);
+        Assert.Equal(
+            UserRole.Agent,
+            currentUser.Role);
+        Assert.Null(
+            currentUser.PhotographyCompanyId);
+    }
+
     private static RegisterRequestDTO
         CreateRegisterRequest()
     {
