@@ -1,15 +1,14 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Recam.IntegrationTests;
 
 public sealed class HealthEndpointTests
-    : IClassFixture<WebApplicationFactory<Program>>
+    : IClassFixture<RecamWebApplicationFactory>
 {
     private readonly HttpClient _client;
 
     public HealthEndpointTests(
-        WebApplicationFactory<Program> factory)
+        RecamWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
     }
