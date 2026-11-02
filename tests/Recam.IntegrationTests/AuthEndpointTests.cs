@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Recam.Api.DTOs.Auth;
 using Recam.Api.Enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Recam.IntegrationTests;
 
@@ -10,9 +11,12 @@ public sealed class AuthEndpointTests
 {
     private readonly HttpClient _client;
 
+    private readonly RecamWebApplicationFactory _factory;
+
     public AuthEndpointTests(
         RecamWebApplicationFactory factory)
     {
+        _factory = factory;
         _client = factory.CreateClient();
     }
 
@@ -330,6 +334,142 @@ public sealed class AuthEndpointTests
         Assert.Equal(
             HttpStatusCode.Unauthorized,
             oldRefreshTokenResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task ForgotAndResetPassword_WithValidToken_ResetsPassword()
+    {
+        var registerRequest = CreateRegisterRequest();
+
+        var registerResponse =
+            await _client.PostAsJsonAsync(
+                "/api/auth/register",
+                registerRequest);
+
+        var registered =
+            await registerResponse.Content
+                .ReadFromJsonAsync<AuthResponseDTO>();
+
+        Assert.NotNull(registered);
+
+        var forgotResponse =
+            await _client.PostAsJsonAsync(
+                "/api/auth/forgot-password",
+                new ForgotPasswordRequestDTO
+                {
+                    Email = registerRequest.Email
+                });
+
+        Assert.Equal(
+            HttpStatusCode.Accepted,
+            forgotResponse.StatusCode);
+
+        var emailSender =
+            _factory.Services.GetRequiredService<
+                TestPasswordResetEmailSender>();
+
+        var resetToken =
+            emailSender.GetToken(
+                registerRequest.Email);
+
+        Assert.NotNull(resetToken);
+
+        const string newPassword =
+            "ResetAgent123!";
+
+        var resetResponse =
+            await _client.PostAsJsonAsync(
+                "/api/auth/reset-password",
+                new ResetPasswordRequestDTO
+                {
+                    Email = registerRequest.Email,
+                    Token = resetToken,
+                    NewPassword = newPassword
+                });
+
+        Assert.Equal(
+            HttpStatusCode.NoContent,
+            resetResponse.StatusCode);
+
+        var oldPasswordLogin =
+            await _client.PostAsJsonAsync(
+                "/api/auth/login",
+                new LoginRequestDTO
+                {
+                    Email = registerRequest.Email,
+                    Password = registerRequest.Password
+                });
+
+        Assert.Equal(
+            HttpStatusCode.Unauthorized,
+            oldPasswordLogin.StatusCode);
+
+        var newPasswordLogin =
+            await _client.PostAsJsonAsync(
+                "/api/auth/login",
+                new LoginRequestDTO
+                {
+                    Email = registerRequest.Email,
+                    Password = newPassword
+                });
+
+        Assert.Equal(
+            HttpStatusCode.OK,
+            newPasswordLogin.StatusCode);
+
+        var oldRefreshResponse =
+            await _client.PostAsJsonAsync(
+                "/api/auth/refresh",
+                new RefreshTokenRequestDTO
+                {
+                    RefreshToken =
+                        registered.RefreshToken
+                });
+
+        Assert.Equal(
+            HttpStatusCode.Unauthorized,
+            oldRefreshResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task ForgotPassword_WithUnknownEmail_ReturnsAccepted()
+    {
+        var response =
+            await _client.PostAsJsonAsync(
+                "/api/auth/forgot-password",
+                new ForgotPasswordRequestDTO
+                {
+                    Email =
+                        $"missing-{Guid.NewGuid():N}@example.com"
+                });
+
+        Assert.Equal(
+            HttpStatusCode.Accepted,
+            response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ResetPassword_WithInvalidToken_ReturnsBadRequest()
+    {
+        var registerRequest = CreateRegisterRequest();
+
+        await _client.PostAsJsonAsync(
+            "/api/auth/register",
+            registerRequest);
+
+        var response =
+            await _client.PostAsJsonAsync(
+                "/api/auth/reset-password",
+                new ResetPasswordRequestDTO
+                {
+                    Email = registerRequest.Email,
+                    Token = "invalid-reset-token",
+                    NewPassword = "ResetAgent123!"
+                });
+
+        Assert.Equal(
+            HttpStatusCode.BadRequest,
+            response.StatusCode);
     }
 
     private static RegisterRequestDTO
