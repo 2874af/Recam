@@ -19,4 +19,7 @@ public class AppUser : IdentityUser<Guid>
     public PhotographyCompany? PhotographyCompany { get; set; }
     public ICollection<CompanyAgent> AgentCompanies { get; set; }
     = new List<CompanyAgent>();
+
+    public ICollection<RefreshToken> RefreshTokens { get; set; }
+    = new List<RefreshToken>();
 }

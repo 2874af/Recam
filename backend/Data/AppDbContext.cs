@@ -26,4 +26,7 @@ public class AppDbContext : IdentityUserContext<AppUser, Guid>
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(AppDbContext).Assembly);
     }
+
+    public DbSet<RefreshToken> RefreshTokens
+        => Set<RefreshToken>();
 }

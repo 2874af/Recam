@@ -2,6 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using Recam.Api.Data;
 using Recam.Api.Interfaces;
 using Recam.Api.Services;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Recam.Api.Entities;
+using Recam.Api.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +29,86 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString);
 });
 
+builder.Services
+    .AddIdentityCore<AppUser>(options =>
+    {
+        options.User.RequireUniqueEmail = true;
+
+        options.Password.RequiredLength = 8;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireDigit = true;
+        options.Password.RequireNonAlphanumeric = true;
+    })
+    .AddSignInManager()
+    .AddEntityFrameworkStores<AppDbContext>();
+
+var jwtSection =
+    builder.Configuration.GetSection(JwtOptions.SectionName);
+
+builder.Services
+    .AddOptions<JwtOptions>()
+    .Bind(jwtSection)
+    .Validate(options =>
+        !string.IsNullOrWhiteSpace(options.Issuer),
+        "Jwt:Issuer is required.")
+    .Validate(options =>
+        !string.IsNullOrWhiteSpace(options.Audience),
+        "Jwt:Audience is required.")
+    .Validate(options =>
+        !string.IsNullOrWhiteSpace(options.Key),
+        "Jwt:Key is required.")
+    .Validate(options =>
+        options.AccessTokenMinutes > 0,
+        "Jwt:AccessTokenMinutes must be greater than zero.")
+    .Validate(options =>
+        options.RefreshTokenDays > 0,
+        "Jwt:RefreshTokenDays must be greater than zero.")
+    .ValidateOnStart();
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer();
+
+builder.Services
+    .AddOptions<JwtBearerOptions>(
+        JwtBearerDefaults.AuthenticationScheme)
+    .Configure<IOptions<JwtOptions>>((
+        options,
+        jwtOptionsAccessor) =>
+    {
+        var jwtOptions = jwtOptionsAccessor.Value;
+
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = jwtOptions.Issuer,
+
+                ValidateAudience = true,
+                ValidAudience = jwtOptions.Audience,
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey =
+                    new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtOptions.Key)),
+
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+    });
+
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
 if (app.Environment.IsDevelopment())

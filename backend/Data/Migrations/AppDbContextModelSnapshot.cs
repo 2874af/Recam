@@ -271,6 +271,42 @@ namespace backend.Data.Migrations
                     b.ToTable("PhotographyCompanies");
                 });
 
+            modelBuilder.Entity("Recam.Api.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("ReplacedByTokenId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId", "ExpiresAt");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("Recam.Api.Entities.AppUser", null)
@@ -327,9 +363,22 @@ namespace backend.Data.Migrations
                     b.Navigation("PhotographyCompany");
                 });
 
+            modelBuilder.Entity("Recam.Api.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("Recam.Api.Entities.AppUser", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Recam.Api.Entities.AppUser", b =>
                 {
                     b.Navigation("AgentCompanies");
+
+                    b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("Recam.Api.Entities.PhotographyCompany", b =>
