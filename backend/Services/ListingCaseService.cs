@@ -9,19 +9,44 @@ namespace Recam.Api.Services;
 public sealed class ListingCaseService : IListingCaseService
 {
     private readonly AppDbContext _dbContext;
+    private readonly ICurrentUserContext _currentUser;
 
-    public ListingCaseService(AppDbContext dbContext)
+    public ListingCaseService(
+        AppDbContext dbContext,
+        ICurrentUserContext currentUser)
     {
         _dbContext = dbContext;
+        _currentUser = currentUser;
     }
 
-    public async Task<ListingCaseResponseDTO> CreateAsync(
+    public async Task<ListingCaseResponseDTO?> CreateAsync(
         CreateListingCaseRequestDTO request,
         CancellationToken cancellationToken)
     {
+        if (_currentUser.Role != Enums.UserRole.Agent ||
+            _currentUser.UserId is not Guid agentUserId)
+        {
+            return null;
+        }
+
+        var isCompanyAgent = await _dbContext.CompanyAgents
+            .AnyAsync(
+                relationship =>
+                    relationship.AgentUserId == agentUserId &&
+                    relationship.PhotographyCompanyId ==
+                        request.PhotographyCompanyId,
+                cancellationToken);
+
+        if (!isCompanyAgent)
+        {
+            return null;
+        }
+
         var listingCase = new ListingCase
         {
             Id = Guid.NewGuid(),
+            PhotographyCompanyId = request.PhotographyCompanyId,
+            AgentUserId = agentUserId,
             Address = request.Address.Trim(),
             Bedrooms = request.Bedrooms,
             Bathrooms = request.Bathrooms,
@@ -40,11 +65,25 @@ public sealed class ListingCaseService : IListingCaseService
         Guid id,
         CancellationToken cancellationToken)
     {
-        var listingCase = await _dbContext.ListingCases
-            .AsNoTracking()
-            .FirstOrDefaultAsync(
-                item => item.Id == id,
-                cancellationToken);
+        var query = _dbContext.ListingCases.AsNoTracking();
+
+        query = _currentUser.Role switch
+        {
+            Enums.UserRole.Agent
+                when _currentUser.UserId is Guid userId =>
+                query.Where(item => item.AgentUserId == userId),
+
+            Enums.UserRole.Admin or Enums.UserRole.Staff
+                when _currentUser.PhotographyCompanyId is Guid companyId =>
+                query.Where(item =>
+                    item.PhotographyCompanyId == companyId),
+
+            _ => query.Where(_ => false)
+        };
+
+        var listingCase = await query.FirstOrDefaultAsync(
+            item => item.Id == id,
+            cancellationToken);
 
         return listingCase is null
             ? null
@@ -56,6 +95,8 @@ public sealed class ListingCaseService : IListingCaseService
         return new ListingCaseResponseDTO
         {
             Id = listingCase.Id,
+            PhotographyCompanyId = listingCase.PhotographyCompanyId,
+            AgentUserId = listingCase.AgentUserId,
             Address = listingCase.Address,
             Status = listingCase.Status,
             Bedrooms = listingCase.Bedrooms,

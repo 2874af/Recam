@@ -6,6 +6,10 @@ public sealed class ListingCaseResponseDTO
 {
     public Guid Id { get; init; }
 
+    public Guid PhotographyCompanyId { get; init; }
+
+    public Guid AgentUserId { get; init; }
+
     public string Address { get; init; } = string.Empty;
 
     public ListingStatus Status { get; init; }

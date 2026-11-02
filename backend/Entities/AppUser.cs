@@ -22,4 +22,7 @@ public class AppUser : IdentityUser<Guid>
 
     public ICollection<RefreshToken> RefreshTokens { get; set; }
     = new List<RefreshToken>();
+
+    public ICollection<ListingCase> ListingCases { get; set; }
+    = new List<ListingCase>();
 }

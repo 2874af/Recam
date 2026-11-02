@@ -4,7 +4,7 @@ namespace Recam.Api.Interfaces;
 
 public interface IListingCaseService
 {
-    Task<ListingCaseResponseDTO> CreateAsync(
+    Task<ListingCaseResponseDTO?> CreateAsync(
         CreateListingCaseRequestDTO request,
         CancellationToken cancellationToken);
 

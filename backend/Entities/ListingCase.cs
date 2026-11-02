@@ -18,6 +18,14 @@ public class ListingCase
 
     public decimal? Area { get; set; }
 
+    public Guid PhotographyCompanyId { get; set; }
+
+    public PhotographyCompany PhotographyCompany { get; set; } = null!;
+
+    public Guid AgentUserId { get; set; }
+
+    public AppUser AgentUser { get; set; } = null!;
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;

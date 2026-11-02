@@ -8,8 +8,7 @@ namespace Recam.Api.Controllers;
 
 [ApiController]
 [Route("api/listing-cases")]
-[Authorize(
-    Policy = AuthorizationPolicies.CompanyMember)]
+[Authorize]
 public sealed class ListingCasesController : ControllerBase
 {
     private readonly IListingCaseService _listingCaseService;
@@ -21,6 +20,7 @@ public sealed class ListingCasesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = AuthorizationPolicies.AgentOnly)]
     [ProducesResponseType<ListingCaseResponseDTO>(
         StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -31,6 +31,11 @@ public sealed class ListingCasesController : ControllerBase
         var response = await _listingCaseService.CreateAsync(
             request,
             cancellationToken);
+
+        if (response is null)
+        {
+            return Forbid();
+        }
 
         return CreatedAtAction(
             nameof(GetById),
