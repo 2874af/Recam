@@ -4,6 +4,8 @@ namespace Recam.Api.DTOs;
 
 public sealed class CreateListingCaseRequestDTO
 {
+    public Guid PhotographyCompanyId { get; init; }
+
     [Required]
     [StringLength(300, MinimumLength = 5)]
     public string Address { get; init; } = string.Empty;

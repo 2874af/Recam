@@ -38,6 +38,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<IListingCaseService, ListingCaseService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

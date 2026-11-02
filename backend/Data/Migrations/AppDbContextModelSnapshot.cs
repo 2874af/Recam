@@ -216,7 +216,11 @@ namespace backend.Data.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<Guid>("AgentUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<decimal?>("Area")
                         .HasColumnType("numeric");
@@ -233,6 +237,9 @@ namespace backend.Data.Migrations
                     b.Property<int>("Garages")
                         .HasColumnType("integer");
 
+                    b.Property<Guid>("PhotographyCompanyId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -240,6 +247,10 @@ namespace backend.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AgentUserId", "Id");
+
+                    b.HasIndex("PhotographyCompanyId", "Id");
 
                     b.ToTable("ListingCases");
                 });
@@ -363,6 +374,25 @@ namespace backend.Data.Migrations
                     b.Navigation("PhotographyCompany");
                 });
 
+            modelBuilder.Entity("Recam.Api.Entities.ListingCase", b =>
+                {
+                    b.HasOne("Recam.Api.Entities.AppUser", "AgentUser")
+                        .WithMany("ListingCases")
+                        .HasForeignKey("AgentUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Recam.Api.Entities.PhotographyCompany", "PhotographyCompany")
+                        .WithMany("ListingCases")
+                        .HasForeignKey("PhotographyCompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AgentUser");
+
+                    b.Navigation("PhotographyCompany");
+                });
+
             modelBuilder.Entity("Recam.Api.Entities.RefreshToken", b =>
                 {
                     b.HasOne("Recam.Api.Entities.AppUser", "User")
@@ -378,12 +408,16 @@ namespace backend.Data.Migrations
                 {
                     b.Navigation("AgentCompanies");
 
+                    b.Navigation("ListingCases");
+
                     b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("Recam.Api.Entities.PhotographyCompany", b =>
                 {
                     b.Navigation("Agents");
+
+                    b.Navigation("ListingCases");
 
                     b.Navigation("Members");
                 });

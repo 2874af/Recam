@@ -19,4 +19,10 @@ public class PhotographyCompany
 
     public ICollection<CompanyAgent> Agents { get; set; }
     = new List<CompanyAgent>();
+
+    public ICollection<ListingCase> ListingCases
+    {
+        get;
+        set;
+    } = new List<ListingCase>();
 }
