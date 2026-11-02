@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Recam.Api.Entities;
 using Recam.Api.Interfaces;
 using Recam.Api.Options;
+using Recam.Api.Authorization;
 
 namespace Recam.Api.Services;
 
@@ -52,8 +53,9 @@ public class TokenService : ITokenService
         {
             claims.Add(
                 new Claim(
-                    "company_id",
-                    user.PhotographyCompanyId.Value.ToString()));
+                    RecamClaimTypes.CompanyId,
+                    user.PhotographyCompanyId.Value.ToString())
+            );
         }
 
         var signingKey = new SymmetricSecurityKey(

@@ -9,11 +9,31 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Recam.Api.Entities;
 using Recam.Api.Options;
+using Recam.Api.Authorization;
+using Recam.Api.Enums;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            Description = "Enter the JWT access token."
+        });
+
+    options.AddSecurityRequirement(document =>
+        new OpenApiSecurityRequirement
+        {
+            [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+        });
+});
 
 builder.Services.AddControllers();
 
@@ -100,7 +120,50 @@ builder.Services
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy(
+            AuthorizationPolicies.AdminOnly,
+            policy =>
+            {
+                policy.RequireRole(
+                    UserRole.Admin.ToString());
+
+                policy.RequireClaim(
+                    RecamClaimTypes.CompanyId);
+            });
+
+        options.AddPolicy(
+            AuthorizationPolicies.StaffOnly,
+            policy =>
+            {
+                policy.RequireRole(
+                    UserRole.Staff.ToString());
+
+                policy.RequireClaim(
+                    RecamClaimTypes.CompanyId);
+            });
+
+        options.AddPolicy(
+            AuthorizationPolicies.AgentOnly,
+            policy =>
+            {
+                policy.RequireRole(
+                    UserRole.Agent.ToString());
+            });
+
+        options.AddPolicy(
+            AuthorizationPolicies.CompanyMember,
+            policy =>
+            {
+                policy.RequireRole(
+                    UserRole.Admin.ToString(),
+                    UserRole.Staff.ToString());
+
+                policy.RequireClaim(
+                    RecamClaimTypes.CompanyId);
+            });
+    });
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
