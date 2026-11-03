@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Recam.Api.Data;
 using Recam.Api.DTOs;
 using Recam.Api.Entities;
 using Recam.Api.Interfaces;
@@ -8,14 +6,14 @@ namespace Recam.Api.Services;
 
 public sealed class ListingCaseService : IListingCaseService
 {
-    private readonly AppDbContext _dbContext;
+    private readonly IListingCaseRepository _repository;
     private readonly ICurrentUserContext _currentUser;
 
     public ListingCaseService(
-        AppDbContext dbContext,
+        IListingCaseRepository repository,
         ICurrentUserContext currentUser)
     {
-        _dbContext = dbContext;
+        _repository = repository;
         _currentUser = currentUser;
     }
 
@@ -29,13 +27,10 @@ public sealed class ListingCaseService : IListingCaseService
             return null;
         }
 
-        var isCompanyAgent = await _dbContext.CompanyAgents
-            .AnyAsync(
-                relationship =>
-                    relationship.AgentUserId == agentUserId &&
-                    relationship.PhotographyCompanyId ==
-                        request.PhotographyCompanyId,
-                cancellationToken);
+        var isCompanyAgent = await _repository.IsCompanyAgentAsync(
+            agentUserId,
+            request.PhotographyCompanyId,
+            cancellationToken);
 
         if (!isCompanyAgent)
         {
@@ -54,9 +49,7 @@ public sealed class ListingCaseService : IListingCaseService
             Area = request.Area
         };
 
-        _dbContext.ListingCases.Add(listingCase);
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _repository.AddAsync(listingCase, cancellationToken);
 
         return MapToResponse(listingCase);
     }
@@ -65,25 +58,18 @@ public sealed class ListingCaseService : IListingCaseService
         Guid id,
         CancellationToken cancellationToken)
     {
-        var query = _dbContext.ListingCases.AsNoTracking();
-
-        query = _currentUser.Role switch
+        var listingCase = _currentUser.Role switch
         {
             Enums.UserRole.Agent
                 when _currentUser.UserId is Guid userId =>
-                query.Where(item => item.AgentUserId == userId),
+                await _repository.FindForAgentAsync(id, userId, cancellationToken),
 
             Enums.UserRole.Admin or Enums.UserRole.Staff
                 when _currentUser.PhotographyCompanyId is Guid companyId =>
-                query.Where(item =>
-                    item.PhotographyCompanyId == companyId),
+                await _repository.FindForCompanyAsync(id, companyId, cancellationToken),
 
-            _ => query.Where(_ => false)
+            _ => null
         };
-
-        var listingCase = await query.FirstOrDefaultAsync(
-            item => item.Id == id,
-            cancellationToken);
 
         return listingCase is null
             ? null
