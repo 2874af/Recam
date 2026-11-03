@@ -15,6 +15,7 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly AppDbContext _dbContext;
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly ITokenService _tokenService;
     private readonly JwtOptions _jwtOptions;
     private readonly ICurrentUserContext _currentUser;
@@ -25,6 +26,7 @@ public class AuthService : IAuthService
     public AuthService(
         UserManager<AppUser> userManager,
         AppDbContext dbContext,
+        IRefreshTokenRepository refreshTokenRepository,
         ITokenService tokenService,
         IOptions<JwtOptions> jwtOptions,
         ICurrentUserContext currentUser,
@@ -32,6 +34,7 @@ public class AuthService : IAuthService
     {
         _userManager = userManager;
         _dbContext = dbContext;
+        _refreshTokenRepository = refreshTokenRepository;
         _tokenService = tokenService;
         _jwtOptions = jwtOptions.Value;
         _currentUser = currentUser;
@@ -161,11 +164,8 @@ public class AuthService : IAuthService
         }
 
         var activeRefreshTokens =
-            await _dbContext.RefreshTokens
-                .Where(token =>
-                    token.UserId == userId &&
-                    token.RevokedAt == null)
-                .ToListAsync(cancellationToken);
+            await _refreshTokenRepository.FindUnrevokedByUserAsync(
+                userId, cancellationToken);
 
         var revokedAt = DateTimeOffset.UtcNow;
 
@@ -174,7 +174,7 @@ public class AuthService : IAuthService
             token.RevokedAt = revokedAt;
         }
 
-        await _dbContext.SaveChangesAsync(
+        await _refreshTokenRepository.SaveChangesAsync(
             cancellationToken);
 
         return OperationResult.Success();
@@ -224,11 +224,8 @@ public class AuthService : IAuthService
                 request.RefreshToken);
 
         var storedToken =
-            await _dbContext.RefreshTokens
-                .Include(token => token.User)
-                .SingleOrDefaultAsync(
-                    token => token.TokenHash == tokenHash,
-                    cancellationToken);
+            await _refreshTokenRepository.FindByHashAsync(
+                tokenHash, includeUser: true, cancellationToken);
 
         if (storedToken is null ||
             !storedToken.IsActive)
@@ -254,10 +251,8 @@ public class AuthService : IAuthService
                 request.RefreshToken);
 
         var storedToken =
-            await _dbContext.RefreshTokens
-                .SingleOrDefaultAsync(
-                    token => token.TokenHash == tokenHash,
-                    cancellationToken);
+            await _refreshTokenRepository.FindByHashAsync(
+                tokenHash, includeUser: false, cancellationToken);
 
         if (storedToken is null ||
             !storedToken.IsActive)
@@ -268,7 +263,7 @@ public class AuthService : IAuthService
         storedToken.RevokedAt =
             DateTimeOffset.UtcNow;
 
-        await _dbContext.SaveChangesAsync(
+        await _refreshTokenRepository.SaveChangesAsync(
             cancellationToken);
     }
 
@@ -297,9 +292,8 @@ public class AuthService : IAuthService
                 _jwtOptions.RefreshTokenDays)
         };
 
-        _dbContext.RefreshTokens.Add(
-            storedRefreshToken);
-        
+        _refreshTokenRepository.Add(storedRefreshToken);
+
         if (tokenToReplace is not null)
         {
             tokenToReplace.RevokedAt = now;
@@ -307,7 +301,7 @@ public class AuthService : IAuthService
                 storedRefreshToken.Id;
         }
 
-        await _dbContext.SaveChangesAsync(
+        await _refreshTokenRepository.SaveChangesAsync(
             cancellationToken);
 
         return new AuthResponseDTO
@@ -391,11 +385,8 @@ public class AuthService : IAuthService
         }
 
         var refreshTokens =
-            await _dbContext.RefreshTokens
-                .Where(token =>
-                    token.UserId == user.Id &&
-                    token.RevokedAt == null)
-                .ToListAsync(cancellationToken);
+            await _refreshTokenRepository.FindUnrevokedByUserAsync(
+                user.Id, cancellationToken);
 
         var revokedAt = DateTimeOffset.UtcNow;
 
@@ -404,7 +395,7 @@ public class AuthService : IAuthService
             token.RevokedAt = revokedAt;
         }
 
-        await _dbContext.SaveChangesAsync(
+        await _refreshTokenRepository.SaveChangesAsync(
             cancellationToken);
 
         return OperationResult.Success();

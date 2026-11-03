@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Recam.Api.Data;
 using Recam.Api.Interfaces;
+using Recam.Api.Repositories;
 using Recam.Api.Services;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,6 +38,7 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddControllers();
 
+builder.Services.AddScoped<IListingCaseRepository, ListingCaseRepository>();
 builder.Services.AddScoped<IListingCaseService, ListingCaseService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
@@ -251,6 +253,7 @@ else
         $"Unsupported email provider: {emailProvider}");
 }
 
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
